@@ -7,22 +7,24 @@ const weddingData = {
   groom: "Irshad",
   bride: "Nidha",
 
-  groomFather: "[Groom Father's Name – To Be Added]",
-  groomMother: "[Groom Mother's Name – To Be Added]",
+  groomFather: "Rasheed",
+  groomMother: "Nadeera",
   brideFather: "[Bride Father's Name – To Be Added]",
   brideMother: "[Bride Mother's Name – To Be Added]",
 
-  // Display text shown on the Nikah Details card. Edit freely.
-  date: "[Wedding Date]",
-  day: "[Wedding Day]",
-  time: "[Wedding Time]",
-  venue: "[Venue Name]",
-  address: "[Complete Venue Address]",
+  // Display text shown on the Reception Details card. Edit freely.
+  date: "29th November 2026",
+  day: "Sunday",
+  time: "10:30", // AM/PM not specified — confirm and add it here, e.g. "10:30 AM"
+  venue: "Moulana Auditorium",
+  address: "Kozhikkode Road, Aryambavu, Kombam",
 
-  // ISO datetime used ONLY to drive the live countdown, e.g. "2026-12-20T11:00:00".
-  // Leave empty until the real date is confirmed — the countdown will show a
-  // graceful placeholder instead of a fake countdown.
-  weddingDateISO: "",
+  // ISO datetime used ONLY to drive the live countdown. Includes the +05:30
+  // (India Standard Time / Kerala) offset explicitly, so every guest sees a
+  // countdown to the same real moment regardless of their own device's timezone.
+  // AM/PM for "10:30" was not confirmed — this assumes 10:30 AM (matching the
+  // original ceremony's 11:00 AM). Change to T22:30:00+05:30 if it's actually PM.
+  weddingDateISO: "2026-11-29T10:30:00+05:30",
 
   // Full Google Maps link to the venue, e.g. "https://maps.google.com/?q=...".
   // Leave empty until confirmed — the QR code and Get Directions button will
@@ -41,8 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initLocation();
   initQrCode();
   initRsvp();
-  initGallery();
-  initLightbox();
   initMusic();
 });
 
@@ -146,10 +146,17 @@ function initCountdown() {
     el.classList.add('pulse');
   };
 
+  // Declared before `tick` (and left null until the interval actually starts) so
+  // that if the target date is already in the past on the very first call, this
+  // read doesn't throw. It used to be a `const` assigned only after this first
+  // call, which crashed on a past date and silently skipped every init function
+  // queued after initCountdown() (RSVP, music, QR, location buttons, etc.).
+  let timer = null;
+
   const tick = () => {
     const diff = target.getTime() - Date.now();
     if (diff <= 0) {
-      clearInterval(timer);
+      if (timer) clearInterval(timer);
       grid.hidden = true;
       message.hidden = false;
       message.textContent = 'Alhamdulillah — The Day Has Arrived!';
@@ -166,7 +173,9 @@ function initCountdown() {
   };
 
   tick();
-  const timer = setInterval(tick, 1000);
+  if (!grid.hidden) {
+    timer = setInterval(tick, 1000);
+  }
 }
 
 /* ---------- Location buttons ---------- */
@@ -190,25 +199,14 @@ function initLocation() {
 
 /* ---------- QR code ---------- */
 function initQrCode() {
-  const qrBox = document.getElementById('qrcode');
+  // Uses the real QR code supplied at assets/gallery/qr.png (already encodes the
+  // venue's Google Maps link) rather than generating one from weddingData.
+  const qrImage = document.getElementById('qrImage');
   const placeholder = document.getElementById('qrPlaceholderText');
-  if (!weddingData.googleMapsUrl) {
+  if (!qrImage) return;
+  qrImage.addEventListener('error', () => {
+    qrImage.hidden = true;
     placeholder.hidden = false;
-    return;
-  }
-  if (typeof QRCode === 'undefined') {
-    placeholder.hidden = false;
-    placeholder.textContent = 'QR code unavailable right now — please use the button below.';
-    return;
-  }
-  // eslint-disable-next-line no-undef
-  new QRCode(qrBox, {
-    text: weddingData.googleMapsUrl,
-    width: 150,
-    height: 150,
-    colorDark: '#123F36',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
   });
 }
 
@@ -240,120 +238,56 @@ function initRsvp() {
   });
 }
 
-/* ---------- Gallery ---------- */
-const GALLERY_COUNT = 8;
-let galleryPhotos = [];
-
-function initGallery() {
-  const grid = document.getElementById('galleryGrid');
-  if (!grid) return;
-
-  for (let i = 1; i <= GALLERY_COUNT; i++) {
-    const src = `assets/gallery/${i}.jpg`;
-    const item = document.createElement('button');
-    item.type = 'button';
-    item.className = 'gallery-item reveal';
-    item.setAttribute('aria-label', `Open photo ${i}`);
-
-    const placeholder = document.createElement('span');
-    placeholder.className = 'gallery-placeholder';
-    placeholder.textContent = '✧';
-    item.appendChild(placeholder);
-
-    const img = document.createElement('img');
-    img.alt = `${weddingData.groom} & ${weddingData.bride} — wedding photo ${i}`;
-    img.loading = 'lazy';
-    img.addEventListener('load', () => item.classList.add('has-image'));
-    img.addEventListener('error', () => { img.remove(); });
-    img.src = src;
-    item.appendChild(img);
-
-    item.addEventListener('click', () => openLightbox(i - 1));
-    grid.appendChild(item);
-    galleryPhotos.push(src);
-  }
-
-  // Re-run reveal observer for dynamically added items
-  initReveal();
-}
-
-/* ---------- Lightbox ---------- */
-let lightboxIndex = 0;
-
-function initLightbox() {
-  const lightbox = document.getElementById('lightbox');
-  const img = document.getElementById('lightboxImg');
-  const closeBtn = document.getElementById('lightboxClose');
-  const prevBtn = document.getElementById('lightboxPrev');
-  const nextBtn = document.getElementById('lightboxNext');
-  if (!lightbox) return;
-
-  closeBtn.addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-  prevBtn.addEventListener('click', () => showLightbox(lightboxIndex - 1));
-  nextBtn.addEventListener('click', () => showLightbox(lightboxIndex + 1));
-
-  document.addEventListener('keydown', (e) => {
-    if (lightbox.hidden) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowRight') showLightbox(lightboxIndex + 1);
-    if (e.key === 'ArrowLeft') showLightbox(lightboxIndex - 1);
-  });
-}
-
-function openLightbox(index) {
-  lightboxIndex = index;
-  showLightbox(index);
-  document.getElementById('lightbox').hidden = false;
-  document.getElementById('lightboxClose').focus();
-}
-
-function showLightbox(index) {
-  const count = galleryPhotos.length;
-  lightboxIndex = ((index % count) + count) % count;
-  const img = document.getElementById('lightboxImg');
-  const placeholder = document.getElementById('lightboxPlaceholder');
-
-  img.hidden = false;
-  placeholder.hidden = true;
-  img.onerror = () => { img.hidden = true; placeholder.hidden = false; };
-  img.src = galleryPhotos[lightboxIndex];
-  img.alt = `${weddingData.groom} & ${weddingData.bride} — wedding photo ${lightboxIndex + 1}`;
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').hidden = true;
-}
-
 /* ---------- Background music ---------- */
 function initMusic() {
   const audio = document.getElementById('bgMusic');
   const toggle = document.getElementById('musicToggle');
   if (!audio || !toggle) return;
 
-  let ready = false;
+  let fileOk = true;
 
-  audio.addEventListener('canplaythrough', () => {
-    ready = true;
+  const showPlaying = () => {
     toggle.hidden = false;
-  }, { once: true });
+    toggle.setAttribute('aria-pressed', 'true');
+    toggle.setAttribute('aria-label', 'Pause background music');
+  };
+  const showPaused = () => {
+    if (!fileOk) return;
+    toggle.hidden = false;
+    toggle.setAttribute('aria-pressed', 'false');
+    toggle.setAttribute('aria-label', 'Play background music');
+  };
 
-  audio.addEventListener('error', () => { toggle.hidden = true; });
+  // assets/music/music.mp3 missing or unplayable: hide the toggle entirely, as before.
+  audio.addEventListener('error', () => { fileOk = false; toggle.hidden = true; }, { once: true });
 
-  // Trigger a load attempt; if assets/music/wedding.mp3 is missing this fires 'error'.
   audio.load();
 
+  // Try to autoplay immediately. Most mobile browsers (and many desktop ones) block
+  // unmuted autoplay until the visitor has interacted with the page at least once —
+  // that's not an error, so fall back to a manual "tap to play" state instead.
+  audio.play().then(showPlaying).catch(() => showPaused());
+
+  // If autoplay was blocked, the guest's very next tap/click/key anywhere on the page
+  // retries it once. Clicks on the toggle itself are left for its own handler below,
+  // so a blocked-autoplay tap on the button doesn't start and instantly stop playback.
+  const retryOnGesture = (event) => {
+    document.removeEventListener('pointerdown', retryOnGesture);
+    document.removeEventListener('keydown', retryOnGesture);
+    if (!fileOk || !audio.paused) return;
+    if (event.target && event.target.closest && event.target.closest('#musicToggle')) return;
+    audio.play().then(showPlaying).catch(() => {});
+  };
+  document.addEventListener('pointerdown', retryOnGesture, { once: true });
+  document.addEventListener('keydown', retryOnGesture, { once: true });
+
   toggle.addEventListener('click', () => {
-    if (!ready) return;
-    const playing = toggle.getAttribute('aria-pressed') === 'true';
-    if (playing) {
-      audio.pause();
-      toggle.setAttribute('aria-pressed', 'false');
-      toggle.setAttribute('aria-label', 'Play background music');
+    if (!fileOk) return;
+    if (audio.paused) {
+      audio.play().then(showPlaying).catch(() => {});
     } else {
-      audio.play().catch(() => {});
-      toggle.setAttribute('aria-pressed', 'true');
-      toggle.setAttribute('aria-label', 'Pause background music');
+      audio.pause();
+      showPaused();
     }
   });
 }

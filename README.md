@@ -23,7 +23,7 @@ const weddingData = {
   venue: "...",
   address: "...",
   weddingDateISO: "",   // drives the live countdown, e.g. "2026-12-20T11:00:00"
-  googleMapsUrl: "",    // drives the QR code + "Get Directions" buttons
+  googleMapsUrl: "",    // drives the "Get Directions" buttons
   whatsappNumber: ""    // digits only with country code, e.g. "919876543210"
 };
 ```
@@ -32,17 +32,18 @@ Until `weddingDateISO`, `googleMapsUrl` and `whatsappNumber` are filled in,
 the site shows honest placeholders ("Date to be announced", disabled
 direction buttons, a WhatsApp fallback message) instead of fake data.
 
-## Photos
+## Location QR code
 
-Add real files named `1.jpg` through `8.jpg` inside
-[assets/gallery/](assets/gallery/). Each slot shows a decorative placeholder
-until its file exists, so you can add photos one at a time.
+The "Scan for Location" card displays [assets/gallery/qr.png](assets/gallery/qr.png)
+directly — it is not generated from `googleMapsUrl`, so replace that image
+file with a new QR code if the venue changes.
 
 ## Background music (optional)
 
-Add a file at `assets/music/wedding.mp3`. The music toggle button in the
-navigation bar only appears once that file loads successfully — it stays
-hidden if the file is missing, and the music never autoplays.
+Add a file at `assets/music/music.mp3`. It attempts to autoplay on load;
+where the browser blocks that (most mobile browsers, and some desktop ones,
+until the visitor interacts), the toggle button in the navigation bar
+offers manual play instead. The toggle stays hidden if the file is missing.
 
 ## Colors
 

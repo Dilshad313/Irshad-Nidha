@@ -38,9 +38,8 @@
       <a href="#home">Home</a>
       <a href="#couple">Couple</a>
       <a href="#families">Families</a>
-      <a href="#nikah">Nikah</a>
+      <a href="#nikah">Reception</a>
       <a href="#location">Location</a>
-      <a href="#gallery">Gallery</a>
       <a href="#rsvp">RSVP</a>
     </nav>
 
@@ -97,8 +96,8 @@
   <!-- ============ 2. COUPLE ============ -->
   <section class="section couple" id="couple" aria-labelledby="coupleHeading">
     <div class="container narrow">
-      <p class="eyebrow reveal">The Beloved</p>
-      <h2 class="section-title script reveal" id="coupleHeading">Irshad &amp; Nidha</h2>
+      <p class="eyebrow reveal light">The Beloved</p>
+      <h2 class="section-title script light reveal" id="coupleHeading">Irshad &amp; Nidha</h2>
       <div class="ornament reveal" aria-hidden="true">&#10070;</div>
       <p class="couple-tagline reveal">
         Two souls, one beautiful journey,<br>
@@ -144,8 +143,8 @@
   <!-- ============ 4. NIKAH DETAILS ============ -->
   <section class="section nikah" id="nikah" aria-labelledby="nikahHeading">
     <div class="container narrow">
-      <p class="eyebrow reveal">Join Us For</p>
-      <h2 class="section-title reveal" id="nikahHeading">Nikah Ceremony</h2>
+      <p class="eyebrow reveal light">Join Us For</p>
+      <h2 class="section-title light reveal" id="nikahHeading">Reception</h2>
 
       <div class="event-card">
         <div class="event-row reveal">
@@ -189,7 +188,7 @@
         <h3 class="qr-title">Scan for Location</h3>
         <p class="qr-subtitle">Scan the QR code to open the wedding venue location in Google Maps.</p>
         <div class="qr-box">
-          <div id="qrcode" aria-label="QR code linking to the venue on Google Maps"></div>
+          <img id="qrImage" class="qr-image" src="assets/gallery/qr.png" alt="QR code that opens the wedding venue location on Google Maps">
           <p class="qr-placeholder-text" id="qrPlaceholderText" hidden>Venue location to be announced soon.</p>
         </div>
         <p class="qr-caption"><span aria-hidden="true">&#128205;</span> Scan for Location</p>
@@ -201,8 +200,8 @@
   <!-- ============ 7. COUNTDOWN ============ -->
   <section class="section countdown" id="countdownSection" aria-labelledby="countdownHeading">
     <div class="container narrow">
-      <p class="eyebrow reveal">Save The Date</p>
-      <h2 class="section-title reveal" id="countdownHeading">Counting Down to Our Special Day</h2>
+      <p class="eyebrow reveal light">Save The Date</p>
+      <h2 class="section-title light reveal" id="countdownHeading">Counting Down to Our Special Day</h2>
 
       <div class="countdown-grid" id="countdownGrid">
         <div class="countdown-cell reveal">
@@ -258,18 +257,6 @@
     </div>
   </section>
 
-  <!-- ============ 11. GALLERY ============ -->
-  <section class="section gallery" id="gallery" aria-labelledby="galleryHeading">
-    <div class="container">
-      <p class="eyebrow reveal">Moments</p>
-      <h2 class="section-title reveal" id="galleryHeading">Gallery</h2>
-
-      <div class="gallery-grid" id="galleryGrid">
-        <!-- 8 editable placeholders. Add real photos to assets/gallery/ named 1.jpg .. 8.jpg -->
-      </div>
-    </div>
-  </section>
-
   <!-- ============ 12. FINAL ============ -->
   <section class="section final" aria-label="Closing">
     <div class="pattern-overlay" aria-hidden="true"></div>
@@ -287,21 +274,12 @@
 
 </main>
 
-<!-- Lightbox for gallery -->
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo preview" hidden>
-  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close preview">&times;</button>
-  <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous photo">&#8249;</button>
-  <img class="lightbox-img" id="lightboxImg" src="" alt="">
-  <p class="lightbox-placeholder" id="lightboxPlaceholder" hidden>Photo coming soon.</p>
-  <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next photo">&#8250;</button>
-</div>
-
-<!-- Optional background music; stays hidden automatically if the file is missing -->
-<audio id="bgMusic" loop preload="none">
-  <source src="assets/music/wedding.mp3" type="audio/mpeg">
+<!-- Background music: autoplays where the browser allows it; otherwise the toggle
+     button lets the guest start it with one tap. Stays hidden if the file is missing. -->
+<audio id="bgMusic" loop preload="auto">
+  <source src="assets/music/music.mp3" type="audio/mpeg">
 </audio>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="script.js" defer></script>
 </body>
 </html>

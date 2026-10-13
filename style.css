@@ -38,8 +38,8 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: var(--font-serif);
-  color: var(--text-dark);
-  background: var(--cream-soft);
+  color: var(--cream);
+  background: var(--deep-green);
   line-height: 1.6;
   overflow-x: hidden;
 }
@@ -282,13 +282,26 @@ a { color: inherit; }
     right: 0;
     flex-direction: column;
     background: var(--deep-green);
-    padding: 1rem 1.5rem 1.5rem;
+    padding: 0 1.5rem;
     gap: 1rem;
     max-height: 0;
     overflow: hidden;
-    transition: max-height var(--transition);
+    opacity: 0;
+    pointer-events: none;
+    /* Chromium doesn't reliably clamp an absolutely-positioned flex column to
+       max-height:0 for layout purposes (a sliver of the first link can still
+       render), so opacity + pointer-events belt-and-suspenders the collapse:
+       even if a stray fraction of a pixel of height leaks through, it is
+       invisible and unclickable while closed. */
+    transition: max-height var(--transition), opacity var(--transition), padding var(--transition);
   }
-  .nav-links.open { max-height: 70vh; overflow-y: auto; }
+  .nav-links.open {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 1rem 1.5rem 1.5rem;
+    opacity: 1;
+    pointer-events: auto;
+  }
   .hamburger { display: flex; }
 }
 
@@ -428,11 +441,11 @@ a { color: inherit; }
 /* =========================================================
    COUPLE
    ========================================================= */
-.couple { background: var(--cream-soft); text-align: center; }
+.couple { background: var(--primary-green); text-align: center; }
 .couple-tagline {
   font-size: clamp(1rem, 2.2vw, 1.25rem);
   font-style: italic;
-  color: var(--text-dark);
+  color: var(--cream);
   margin-top: 0.6rem;
 }
 
@@ -484,10 +497,10 @@ a { color: inherit; }
 /* =========================================================
    NIKAH DETAILS
    ========================================================= */
-.nikah { background: var(--cream-soft); }
+.nikah { background: var(--deep-green); }
 .event-card {
   margin-top: 2.2rem;
-  background: var(--white);
+  background: rgba(247, 241, 227, 0.05);
   border: 1px solid rgba(201, 162, 74, 0.4);
   border-radius: var(--radius);
   box-shadow: var(--shadow-soft);
@@ -498,7 +511,7 @@ a { color: inherit; }
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.6rem;
-  border-bottom: 1px solid rgba(18, 63, 54, 0.08);
+  border-bottom: 1px solid rgba(201, 162, 74, 0.18);
 }
 .event-row:last-child { border-bottom: none; }
 .event-label {
@@ -512,7 +525,7 @@ a { color: inherit; }
 .event-value {
   font-family: var(--font-display);
   font-size: 1.05rem;
-  color: var(--primary-green);
+  color: var(--cream);
   text-align: right;
 }
 
@@ -530,16 +543,18 @@ a { color: inherit; }
 .qr-card {
   margin: 2.5rem auto 0;
   max-width: 340px;
-  background: var(--cream-soft);
+  background: rgba(247, 241, 227, 0.06);
   border-radius: var(--radius);
   border: 2px solid var(--gold);
   box-shadow: var(--shadow-soft);
   padding: 1.8rem 1.5rem;
-  color: var(--text-dark);
+  color: var(--cream);
 }
-.qr-title { font-family: var(--font-heading); font-size: 1.1rem; color: var(--primary-green); }
-.qr-subtitle { font-size: 0.85rem; margin-top: 0.4rem; color: var(--text-dark); opacity: 0.8; }
+.qr-title { font-family: var(--font-heading); font-size: 1.1rem; color: var(--gold-light); }
+.qr-subtitle { font-size: 0.85rem; margin-top: 0.4rem; color: var(--cream); opacity: 0.85; }
 .qr-box {
+  /* Kept intentionally light: the QR image needs a pale quiet-zone margin
+     around it to stay reliably scannable, so this box is not greened. */
   margin: 1.4rem auto;
   padding: 1.2rem;
   background: var(--white);
@@ -548,14 +563,14 @@ a { color: inherit; }
   min-height: 150px;
   min-width: 150px;
 }
-.qr-box #qrcode img, .qr-box #qrcode canvas { display: block; margin: 0 auto; width: 150px !important; height: 150px !important; }
+.qr-image { display: block; margin: 0 auto; width: 100%; max-width: 170px; height: auto; aspect-ratio: 1 / 1; object-fit: contain; }
 .qr-placeholder-text { font-size: 0.85rem; color: var(--text-dark); opacity: 0.7; max-width: 160px; }
 .qr-caption { font-size: 0.8rem; letter-spacing: 0.05em; color: var(--gold); margin-bottom: 1rem; }
 
 /* =========================================================
    COUNTDOWN
    ========================================================= */
-.countdown { background: var(--cream-soft); text-align: center; }
+.countdown { background: var(--primary-green); text-align: center; }
 .countdown-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -564,7 +579,7 @@ a { color: inherit; }
   margin: 2.2rem auto 0;
 }
 .countdown-cell {
-  background: var(--white);
+  background: rgba(247, 241, 227, 0.05);
   border: 1px solid rgba(201, 162, 74, 0.4);
   border-radius: var(--radius);
   padding: 1.2rem 0.4rem;
@@ -574,7 +589,7 @@ a { color: inherit; }
   display: block;
   font-family: var(--font-heading);
   font-size: clamp(1.6rem, 5vw, 2.2rem);
-  color: var(--primary-green);
+  color: var(--cream);
   transition: opacity 0.25s ease;
 }
 .countdown-label {
@@ -588,7 +603,7 @@ a { color: inherit; }
   margin-top: 1.5rem;
   font-family: var(--font-display);
   font-size: 1.2rem;
-  color: var(--primary-green);
+  color: var(--gold-light);
 }
 
 /* =========================================================
@@ -615,11 +630,11 @@ a { color: inherit; }
 /* =========================================================
    MESSAGE
    ========================================================= */
-.message { background: var(--cream-soft); text-align: center; }
+.message { background: var(--primary-green); text-align: center; }
 .message-text {
   font-size: clamp(1rem, 2.2vw, 1.2rem);
   font-style: italic;
-  color: var(--text-dark);
+  color: var(--cream);
   margin-bottom: 0.9rem;
 }
 
@@ -645,80 +660,6 @@ a { color: inherit; }
   font-size: 1.05rem;
   color: var(--gold-light);
 }
-
-/* =========================================================
-   GALLERY
-   ========================================================= */
-.gallery { background: var(--cream-soft); }
-.gallery-grid {
-  margin-top: 2.2rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-}
-.gallery-item {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid rgba(201, 162, 74, 0.4);
-  background: linear-gradient(135deg, var(--primary-green), var(--green-soft));
-  cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition);
-}
-.gallery-item:hover, .gallery-item:focus-visible { transform: translateY(-4px); box-shadow: var(--shadow-soft); }
-.gallery-item img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-.gallery-item:hover img { transform: scale(1.06); }
-.gallery-placeholder {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--gold-light);
-  font-family: var(--font-heading);
-  font-size: 1.6rem;
-}
-.gallery-item.has-image .gallery-placeholder { display: none; }
-.gallery-item button { all: unset; position: absolute; inset: 0; width: 100%; height: 100%; }
-
-/* ---------- Lightbox ---------- */
-.lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 900;
-  background: rgba(8, 43, 37, 0.92);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-.lightbox[hidden] { display: none; }
-.lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: var(--radius); box-shadow: var(--shadow-soft); }
-.lightbox-placeholder {
-  font-family: var(--font-display);
-  font-style: italic;
-  color: var(--gold-light);
-  background: rgba(247, 241, 227, 0.08);
-  border: 1px solid var(--gold);
-  border-radius: var(--radius);
-  padding: 2.5rem 3rem;
-}
-.lightbox-close, .lightbox-nav {
-  position: absolute;
-  background: rgba(247, 241, 227, 0.12);
-  border: 1px solid var(--gold);
-  color: var(--cream);
-  border-radius: 50%;
-  width: 44px; height: 44px;
-  font-size: 1.4rem;
-  display: flex; align-items: center; justify-content: center;
-}
-.lightbox-close { top: 1.2rem; right: 1.2rem; }
-.lightbox-prev { left: 1.2rem; top: 50%; transform: translateY(-50%); }
-.lightbox-next { right: 1.2rem; top: 50%; transform: translateY(-50%); }
-.lightbox-close:hover, .lightbox-nav:hover { background: var(--gold); color: var(--deep-green); }
 
 /* =========================================================
    FINAL
@@ -811,17 +752,12 @@ a { color: inherit; }
 .countdown-grid .countdown-cell.reveal:nth-child(3) { transition-delay: 0.2s; }
 .countdown-grid .countdown-cell.reveal:nth-child(4) { transition-delay: 0.3s; }
 
-.gallery-grid .gallery-item:nth-child(4n+1) { transition-delay: 0s; }
-.gallery-grid .gallery-item:nth-child(4n+2) { transition-delay: 0.08s; }
-.gallery-grid .gallery-item:nth-child(4n+3) { transition-delay: 0.16s; }
-.gallery-grid .gallery-item:nth-child(4n+4) { transition-delay: 0.24s; }
-
 /* ---- Countdown digits: brief pulse whenever a value changes ---- */
 .countdown-num.pulse { animation: numPulse 0.4s ease; }
 @keyframes numPulse {
-  0%   { transform: scale(1);    color: var(--primary-green); }
+  0%   { transform: scale(1);    color: var(--cream); }
   40%  { transform: scale(1.18); color: var(--gold); }
-  100% { transform: scale(1);    color: var(--primary-green); }
+  100% { transform: scale(1);    color: var(--cream); }
 }
 
 /* ---- Buttons: soft shimmer sweep on hover ---- */
