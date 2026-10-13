@@ -31,8 +31,8 @@ const weddingData = {
   // show a graceful placeholder instead of pointing nowhere.
   googleMapsUrl: "",
 
-  // WhatsApp number in international format, digits only, e.g. "919876543210".
-  whatsappNumber: ""
+  // WhatsApp number in international format, digits only (country code + number).
+  whatsappNumber: "918138040466"
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -222,19 +222,30 @@ function initRsvp() {
     response.textContent = text;
   };
 
-  yesBtn.addEventListener('click', () => {
+  // Opens a WhatsApp chat with `weddingData.whatsappNumber`, pre-filled with the
+  // given message. Falls back to an inline note if no number is configured.
+  const openWhatsApp = (message, fallbackText) => {
     if (weddingData.whatsappNumber) {
-      const message = `Assalamu Alaikum, I would like to confirm my attendance for the Nikah of ${weddingData.groom} & ${weddingData.bride}.`;
       const url = `https://wa.me/${weddingData.whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
-      show('JazakAllah Khair! Please send the pre-filled WhatsApp message to confirm.');
+      show('Redirecting you to WhatsApp — please send the pre-filled message to confirm.');
     } else {
-      show('Shukran! Please let the family know directly — RSVP via WhatsApp is coming soon.');
+      show(fallbackText);
     }
+  };
+
+  yesBtn.addEventListener('click', () => {
+    openWhatsApp(
+      `Hello, I'm happy to confirm that I'll attend the wedding of ${weddingData.groom} and ${weddingData.bride}.`,
+      'Shukran! Please let the family know directly — RSVP via WhatsApp is coming soon.'
+    );
   });
 
   noBtn.addEventListener('click', () => {
-    show('Thank you for letting us know. We will miss you — please keep us in your duas.');
+    openWhatsApp(
+      `Hello, I'm sorry that I won't be able to attend the wedding of ${weddingData.groom} and ${weddingData.bride}.`,
+      'Thank you for letting us know. We will miss you — please keep us in your duas.'
+    );
   });
 }
 
@@ -247,50 +258,53 @@ function initMusic() {
   let fileOk = true;
   let unmuted = false;
 
-  const showOn = () => {
-    toggle.hidden = false;
-    toggle.setAttribute('aria-pressed', 'true');
-    toggle.setAttribute('aria-label', 'Pause background music');
-  };
-  const showOff = () => {
+  // Single source of truth for the icon: it reflects whatever the audio element is
+  // actually doing, no matter what caused it — our own code, a gesture-triggered
+  // autoplay retry, or the OS/browser pausing it in the background (e.g. another
+  // app taking audio focus, a phone call, the tab losing visibility). "Playing"
+  // means audible, not just un-paused, since muted-but-running shouldn't show as on.
+  const syncToggle = () => {
     if (!fileOk) return;
     toggle.hidden = false;
-    toggle.setAttribute('aria-pressed', 'false');
-    toggle.setAttribute('aria-label', 'Play background music');
+    const playing = !audio.paused && !audio.muted;
+    toggle.setAttribute('aria-pressed', String(playing));
+    toggle.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
   };
+  audio.addEventListener('play', syncToggle);
+  audio.addEventListener('pause', syncToggle);
+  audio.addEventListener('volumechange', syncToggle); // covers mute/unmute
 
   // assets/music/music.mp3 missing or unplayable: hide the toggle entirely, as before.
   audio.addEventListener('error', () => { fileOk = false; toggle.hidden = true; }, { once: true });
 
   // Strongest supported autoplay: every major browser (desktop and mobile) allows
-  // MUTED autoplay without a user gesture, even though audible autoplay is blocked
-  // everywhere. So the track actually starts playing — silently — the instant the
-  // page can play it, satisfying "starts automatically" as literally as a browser
-  // allows. The very first tap/click/key anywhere just unmutes the already-running
-  // audio (no restart, no buffering gap), so sound begins the moment it's permitted.
+  // MUTED autoplay without a user gesture far more often than audible autoplay,
+  // which is blocked everywhere without exception. So the track attempts to start
+  // playing — silently — the instant the page loads, satisfying "starts
+  // automatically" as literally as a browser allows. The very first tap/click/key
+  // anywhere unmutes the (possibly already-running) audio with no restart or
+  // buffering gap, so sound begins the moment it's permitted.
   audio.muted = true;
   audio.load();
 
   const unmute = () => {
     if (unmuted || !fileOk) return;
     unmuted = true;
-    audio.muted = false;
+    audio.muted = false; // triggers syncToggle via 'volumechange'
     if (audio.paused) {
-      // Muted autoplay itself was blocked too (rare) — this is a real user gesture,
-      // so starting fresh here should succeed.
-      audio.play().then(showOn).catch(() => showOff());
-    } else {
-      showOn();
+      // Muted autoplay was blocked too — this call happens inside a real user
+      // gesture's call stack, so it reliably succeeds; syncToggle fires via 'play'.
+      audio.play().catch(() => {});
     }
   };
 
-  audio.play().catch(() => {}); // muted autoplay; failure here is handled by `unmute()` later
-  showOff();
+  audio.play().catch(() => {}); // attempt muted autoplay; syncToggle reflects the outcome either way
 
   const unmuteOnGesture = (event) => {
     document.removeEventListener('pointerdown', unmuteOnGesture);
     document.removeEventListener('touchstart', unmuteOnGesture);
     document.removeEventListener('keydown', unmuteOnGesture);
+    document.removeEventListener('click', unmuteOnGesture);
     if (!fileOk) return;
     // A tap on the toggle itself is handled by its own click listener below, so it
     // isn't double-handled here.
@@ -300,15 +314,17 @@ function initMusic() {
   document.addEventListener('pointerdown', unmuteOnGesture, { once: true });
   document.addEventListener('touchstart', unmuteOnGesture, { once: true, passive: true });
   document.addEventListener('keydown', unmuteOnGesture, { once: true });
+  document.addEventListener('click', unmuteOnGesture, { once: true });
 
   toggle.addEventListener('click', () => {
     if (!fileOk) return;
     if (!unmuted) { unmute(); return; }
     if (audio.paused) {
-      audio.play().then(showOn).catch(() => {});
+      audio.play().catch(() => {});
     } else {
       audio.pause();
-      showOff();
     }
   });
+
+  syncToggle(); // initial paint: paused + muted -> shows "off"
 }
