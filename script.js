@@ -251,80 +251,101 @@ function initRsvp() {
 
 /* ---------- Background music ---------- */
 function initMusic() {
-  const audio = document.getElementById('bgMusic');
   const toggle = document.getElementById('musicToggle');
-  if (!audio || !toggle) return;
+  const hint = document.getElementById('musicHint');
+  if (!toggle) return;
+  if (typeof Howl === 'undefined') {
+    // Howler failed to load (e.g. offline, CDN blocked) — fail quietly, same as
+    // a missing audio file.
+    toggle.hidden = true;
+    return;
+  }
 
   let fileOk = true;
-  let unmuted = false;
 
-  // Single source of truth for the icon: it reflects whatever the audio element is
-  // actually doing, no matter what caused it — our own code, a gesture-triggered
-  // autoplay retry, or the OS/browser pausing it in the background (e.g. another
-  // app taking audio focus, a phone call, the tab losing visibility). "Playing"
-  // means audible, not just un-paused, since muted-but-running shouldn't show as on.
+  const hideHint = () => { if (hint) hint.hidden = true; };
+
+  // Single source of truth for the icon: `sound.playing()` is Howler's own
+  // ground truth, read fresh every time rather than tracked in a local variable,
+  // so the icon can't drift out of sync with reality.
   const syncToggle = () => {
     if (!fileOk) return;
     toggle.hidden = false;
-    const playing = !audio.paused && !audio.muted;
+    const playing = sound.playing();
     toggle.setAttribute('aria-pressed', String(playing));
     toggle.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
-  };
-  audio.addEventListener('play', syncToggle);
-  audio.addEventListener('pause', syncToggle);
-  audio.addEventListener('volumechange', syncToggle); // covers mute/unmute
-
-  // assets/music/music.mp3 missing or unplayable: hide the toggle entirely, as before.
-  audio.addEventListener('error', () => { fileOk = false; toggle.hidden = true; }, { once: true });
-
-  // Strongest supported autoplay: every major browser (desktop and mobile) allows
-  // MUTED autoplay without a user gesture far more often than audible autoplay,
-  // which is blocked everywhere without exception. So the track attempts to start
-  // playing — silently — the instant the page loads, satisfying "starts
-  // automatically" as literally as a browser allows. The very first tap/click/key
-  // anywhere unmutes the (possibly already-running) audio with no restart or
-  // buffering gap, so sound begins the moment it's permitted.
-  audio.muted = true;
-  audio.load();
-
-  const unmute = () => {
-    if (unmuted || !fileOk) return;
-    unmuted = true;
-    audio.muted = false; // triggers syncToggle via 'volumechange'
-    if (audio.paused) {
-      // Muted autoplay was blocked too — this call happens inside a real user
-      // gesture's call stack, so it reliably succeeds; syncToggle fires via 'play'.
-      audio.play().catch(() => {});
-    }
+    if (playing) hideHint(); // music actually started — the hint has done its job
   };
 
-  audio.play().catch(() => {}); // attempt muted autoplay; syncToggle reflects the outcome either way
+  const sound = new Howl({
+    src: ['assets/music/music.mp3'],
+    loop: true,
+    preload: true,
+    // Howler's default Web Audio API mode loads files via XMLHttpRequest, which
+    // Chromium's CORS policy blocks entirely for the file:// protocol — exactly
+    // how this site is opened (double-clicking index.html). html5:true makes
+    // Howler use a plain <audio> element internally instead, which loads file://
+    // URLs the normal way media elements always have. Confirmed by testing both.
+    html5: true,
+    onplay: syncToggle,
+    onpause: syncToggle,
+    onstop: syncToggle,
+    // assets/music/music.mp3 missing or unplayable: hide the toggle (and hint)
+    // entirely.
+    onloaderror: () => { fileOk = false; toggle.hidden = true; hideHint(); },
+    // Confirmed blocked by the browser's autoplay policy (not assumed — this
+    // only fires when the browser actually rejects play()).
+    //
+    // Howler.autoUnlock (its own built-in retry-on-interaction mechanism) is
+    // tied to resuming the shared Web Audio API AudioContext, and does not
+    // apply to sounds loaded in html5:true mode — the mode this file requires
+    // to load at all under file://. Verified directly: with autoUnlock alone,
+    // clicking the toggle button played the track, but clicking or tapping
+    // anywhere else on the page did not. So the document-level retry below is
+    // written explicitly, calling the same public sound.play() from inside a
+    // genuine interaction handler — not a bypass, the same sanctioned pattern,
+    // just not left to a library mechanism that doesn't cover this mode.
+    onplayerror: () => {
+      syncToggle();
+      if (hint && fileOk) {
+        hint.hidden = false;
+        // Restart the CSS fade-in/out animation each time this fires.
+        hint.style.animation = 'none';
+        void hint.offsetWidth;
+        hint.style.animation = '';
+      }
+    },
+  });
 
-  const unmuteOnGesture = (event) => {
-    document.removeEventListener('pointerdown', unmuteOnGesture);
-    document.removeEventListener('touchstart', unmuteOnGesture);
-    document.removeEventListener('keydown', unmuteOnGesture);
-    document.removeEventListener('click', unmuteOnGesture);
-    if (!fileOk) return;
-    // A tap on the toggle itself is handled by its own click listener below, so it
-    // isn't double-handled here.
+  // Attempt real (audible) playback immediately on load. Never assumed to have
+  // succeeded — `sound.playing()` and the callbacks above are the only sources
+  // of truth for whether it's actually audible.
+  sound.play();
+
+  // Retry at the first permitted interaction anywhere on the page. Listens for
+  // 'click', 'touchend' and 'keydown' — the events browsers actually treat as
+  // genuine activation for media playback — not 'pointerdown'/'touchstart'
+  // (gesture *start*), which iOS Safari in particular doesn't honor for audio.
+  // Stays attached (not {once:true}) until playback is actually confirmed, so a
+  // failed attempt is retried on the next interaction rather than giving up.
+  const INTERACTION_EVENTS = ['click', 'touchend', 'keydown'];
+  const onInteraction = (event) => {
+    if (sound.playing() || !fileOk) return;
+    // The toggle has its own click handler below, so it isn't double-handled.
     if (event.target && event.target.closest && event.target.closest('#musicToggle')) return;
-    unmute();
+    sound.play();
   };
-  document.addEventListener('pointerdown', unmuteOnGesture, { once: true });
-  document.addEventListener('touchstart', unmuteOnGesture, { once: true, passive: true });
-  document.addEventListener('keydown', unmuteOnGesture, { once: true });
-  document.addEventListener('click', unmuteOnGesture, { once: true });
+  INTERACTION_EVENTS.forEach((type) => document.addEventListener(type, onInteraction, { passive: true }));
 
   toggle.addEventListener('click', () => {
     if (!fileOk) return;
-    if (!unmuted) { unmute(); return; }
-    if (audio.paused) {
-      audio.play().catch(() => {});
+    if (sound.playing()) {
+      sound.pause();
     } else {
-      audio.pause();
+      sound.play();
     }
+    hideHint();
   });
 
-  syncToggle(); // initial paint: paused + muted -> shows "off"
+  syncToggle(); // initial paint
 }

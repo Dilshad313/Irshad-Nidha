@@ -47,6 +47,10 @@
       <button type="button" class="music-toggle" id="musicToggle" aria-pressed="false" aria-label="Play background music" hidden>
         <span class="music-icon" aria-hidden="true">&#9834;</span>
       </button>
+      <!-- Shown only if audible autoplay was blocked; disappears the instant
+           music starts (any tap anywhere) or after a few seconds either way.
+           Decorative and non-blocking — never intercepts clicks. -->
+      <span class="music-hint" id="musicHint" aria-hidden="true" hidden>Tap for music &#9834;</span>
       <button type="button" class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
         <span></span><span></span><span></span>
       </button>
@@ -274,12 +278,9 @@
 
 </main>
 
-<!-- Background music: autoplays where the browser allows it; otherwise the toggle
-     button lets the guest start it with one tap. Stays hidden if the file is missing. -->
-<audio id="bgMusic" loop preload="auto">
-  <source src="assets/music/music.mp3" type="audio/mpeg">
-</audio>
-
+<!-- Background music (assets/music/music.mp3) is managed entirely by Howler.js in
+     script.js — no <audio> element here, so there is only ever one audio instance. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 <script src="script.js" defer></script>
 </body>
 </html>
