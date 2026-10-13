@@ -273,12 +273,14 @@ function initMusic() {
   // so a blocked-autoplay tap on the button doesn't start and instantly stop playback.
   const retryOnGesture = (event) => {
     document.removeEventListener('pointerdown', retryOnGesture);
+    document.removeEventListener('touchstart', retryOnGesture);
     document.removeEventListener('keydown', retryOnGesture);
     if (!fileOk || !audio.paused) return;
     if (event.target && event.target.closest && event.target.closest('#musicToggle')) return;
     audio.play().then(showPlaying).catch(() => {});
   };
   document.addEventListener('pointerdown', retryOnGesture, { once: true });
+  document.addEventListener('touchstart', retryOnGesture, { once: true, passive: true });
   document.addEventListener('keydown', retryOnGesture, { once: true });
 
   toggle.addEventListener('click', () => {
