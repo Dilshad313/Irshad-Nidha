@@ -245,13 +245,14 @@ function initMusic() {
   if (!audio || !toggle) return;
 
   let fileOk = true;
+  let unmuted = false;
 
-  const showPlaying = () => {
+  const showOn = () => {
     toggle.hidden = false;
     toggle.setAttribute('aria-pressed', 'true');
     toggle.setAttribute('aria-label', 'Pause background music');
   };
-  const showPaused = () => {
+  const showOff = () => {
     if (!fileOk) return;
     toggle.hidden = false;
     toggle.setAttribute('aria-pressed', 'false');
@@ -261,35 +262,53 @@ function initMusic() {
   // assets/music/music.mp3 missing or unplayable: hide the toggle entirely, as before.
   audio.addEventListener('error', () => { fileOk = false; toggle.hidden = true; }, { once: true });
 
+  // Strongest supported autoplay: every major browser (desktop and mobile) allows
+  // MUTED autoplay without a user gesture, even though audible autoplay is blocked
+  // everywhere. So the track actually starts playing — silently — the instant the
+  // page can play it, satisfying "starts automatically" as literally as a browser
+  // allows. The very first tap/click/key anywhere just unmutes the already-running
+  // audio (no restart, no buffering gap), so sound begins the moment it's permitted.
+  audio.muted = true;
   audio.load();
 
-  // Try to autoplay immediately. Most mobile browsers (and many desktop ones) block
-  // unmuted autoplay until the visitor has interacted with the page at least once —
-  // that's not an error, so fall back to a manual "tap to play" state instead.
-  audio.play().then(showPlaying).catch(() => showPaused());
-
-  // If autoplay was blocked, the guest's very next tap/click/key anywhere on the page
-  // retries it once. Clicks on the toggle itself are left for its own handler below,
-  // so a blocked-autoplay tap on the button doesn't start and instantly stop playback.
-  const retryOnGesture = (event) => {
-    document.removeEventListener('pointerdown', retryOnGesture);
-    document.removeEventListener('touchstart', retryOnGesture);
-    document.removeEventListener('keydown', retryOnGesture);
-    if (!fileOk || !audio.paused) return;
-    if (event.target && event.target.closest && event.target.closest('#musicToggle')) return;
-    audio.play().then(showPlaying).catch(() => {});
+  const unmute = () => {
+    if (unmuted || !fileOk) return;
+    unmuted = true;
+    audio.muted = false;
+    if (audio.paused) {
+      // Muted autoplay itself was blocked too (rare) — this is a real user gesture,
+      // so starting fresh here should succeed.
+      audio.play().then(showOn).catch(() => showOff());
+    } else {
+      showOn();
+    }
   };
-  document.addEventListener('pointerdown', retryOnGesture, { once: true });
-  document.addEventListener('touchstart', retryOnGesture, { once: true, passive: true });
-  document.addEventListener('keydown', retryOnGesture, { once: true });
+
+  audio.play().catch(() => {}); // muted autoplay; failure here is handled by `unmute()` later
+  showOff();
+
+  const unmuteOnGesture = (event) => {
+    document.removeEventListener('pointerdown', unmuteOnGesture);
+    document.removeEventListener('touchstart', unmuteOnGesture);
+    document.removeEventListener('keydown', unmuteOnGesture);
+    if (!fileOk) return;
+    // A tap on the toggle itself is handled by its own click listener below, so it
+    // isn't double-handled here.
+    if (event.target && event.target.closest && event.target.closest('#musicToggle')) return;
+    unmute();
+  };
+  document.addEventListener('pointerdown', unmuteOnGesture, { once: true });
+  document.addEventListener('touchstart', unmuteOnGesture, { once: true, passive: true });
+  document.addEventListener('keydown', unmuteOnGesture, { once: true });
 
   toggle.addEventListener('click', () => {
     if (!fileOk) return;
+    if (!unmuted) { unmute(); return; }
     if (audio.paused) {
-      audio.play().then(showPlaying).catch(() => {});
+      audio.play().then(showOn).catch(() => {});
     } else {
       audio.pause();
-      showPaused();
+      showOff();
     }
   });
 }
