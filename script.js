@@ -1,6 +1,7 @@
 /* =========================================================
-   Irshad & Nidha — Wedding Invitation
+   Irshad & Nidha — Wedding Invitation (PREMIUM EDITION)
    All editable wedding information lives in `weddingData` below.
+   QR code & background music behaviour are unchanged.
    ========================================================= */
 
 const weddingData = {
@@ -19,24 +20,19 @@ const weddingData = {
   venue: "Moulana Auditorium",
   address: "Kozhikkode Road, Aryambavu, Kombam",
 
-  // ISO datetime used ONLY to drive the live countdown. Includes the +05:30
-  // (India Standard Time / Kerala) offset explicitly, so every guest sees a
-  // countdown to the same real moment regardless of their own device's timezone.
-  // AM/PM for "10:30" was not confirmed — this assumes 10:30 AM (matching the
-  // original ceremony's 11:00 AM). Change to T22:30:00+05:30 if it's actually PM.
+  // ISO datetime used ONLY to drive the live countdown (+05:30 IST).
   weddingDateISO: "2026-11-29T10:30:00+05:30",
 
-  // Full Google Maps link to the venue, e.g. "https://maps.google.com/?q=...".
-  // Leave empty until confirmed — the QR code and Get Directions button will
-  // show a graceful placeholder instead of pointing nowhere.
+  // Full Google Maps link to the venue. Leave empty until confirmed.
   googleMapsUrl: "",
 
-  // WhatsApp number in international format, digits only (country code + number).
+  // WhatsApp number in international format, digits only.
   whatsappNumber: "918138040466"
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   populateContent();
+  initGate();
   initNav();
   initReveal();
   initCountdown();
@@ -44,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initQrCode();
   initRsvp();
   initMusic();
+  initSparkles();
 });
 
 /* ---------- Fill the page from weddingData ---------- */
@@ -70,13 +67,76 @@ function populateContent() {
     if (el) el.textContent = value;
   });
 
+  // Intro gate content
+  const gateNames = document.getElementById('gateNames');
+  if (gateNames) gateNames.innerHTML =
+    `${weddingData.groom} <span class="gate-amp">&amp;</span> ${weddingData.bride}`;
+  const gateDate = document.getElementById('gateDate');
+  if (gateDate) gateDate.textContent = `${weddingData.day} · ${weddingData.date}`;
+
   document.title = `${weddingData.groom} & ${weddingData.bride} | Wedding Invitation`;
+}
+
+/* ---------- Intro gate (opening experience) ---------- */
+function initGate() {
+  const gate = document.getElementById('introGate');
+  const btn = document.getElementById('gateOpenBtn');
+  if (!gate) return;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const open = () => {
+    document.body.classList.remove('gate-active');
+    document.body.classList.add('gate-open');
+    gate.classList.add('opened');
+    // The first genuine interaction also unlocks background music via the
+    // document-level listener in initMusic() — nothing extra needed here.
+    setTimeout(() => gate.remove(), 1700);
+  };
+
+  if (reduceMotion) {
+    // No ceremony for reduced-motion users — land straight on the page.
+    gate.remove();
+    document.body.classList.add('gate-open');
+    return;
+  }
+
+  document.body.classList.add('gate-active');
+  if (btn) btn.addEventListener('click', open, { once: true });
+}
+
+/* ---------- Gold sparkles ---------- */
+function initSparkles() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.sparkles').forEach((wrap) => {
+    const count = Number(wrap.dataset.count) || 18;
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('span');
+      s.className = 'sparkle';
+      const size = 2 + Math.random() * 3;
+      s.style.width = s.style.height = size.toFixed(1) + 'px';
+      s.style.left = (Math.random() * 100).toFixed(2) + '%';
+      s.style.top = (20 + Math.random() * 80).toFixed(2) + '%';
+      s.style.animationDelay = (Math.random() * 8).toFixed(2) + 's';
+      s.style.animationDuration = (5 + Math.random() * 6).toFixed(2) + 's';
+      wrap.appendChild(s);
+    }
+  });
 }
 
 /* ---------- Navigation ---------- */
 function initNav() {
+  const nav = document.getElementById('siteNav');
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
+
+  // Transparent over the hero, solid after scrolling.
+  if (nav) {
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
   if (!hamburger || !navLinks) return;
 
   const closeMenu = () => {
@@ -136,21 +196,15 @@ function initCountdown() {
     seconds: document.getElementById('cdSeconds')
   };
 
-  // Update a digit's text, and briefly pulse it, but only when the value actually changes.
   const setCell = (el, value) => {
     const formatted = String(value).padStart(2, '0');
     if (el.textContent === formatted) return;
     el.textContent = formatted;
     el.classList.remove('pulse');
-    void el.offsetWidth; // restart the animation even if a pulse is already mid-flight
+    void el.offsetWidth;
     el.classList.add('pulse');
   };
 
-  // Declared before `tick` (and left null until the interval actually starts) so
-  // that if the target date is already in the past on the very first call, this
-  // read doesn't throw. It used to be a `const` assigned only after this first
-  // call, which crashed on a past date and silently skipped every init function
-  // queued after initCountdown() (RSVP, music, QR, location buttons, etc.).
   let timer = null;
 
   const tick = () => {
@@ -197,10 +251,8 @@ function initLocation() {
   });
 }
 
-/* ---------- QR code ---------- */
+/* ---------- QR code (unchanged: uses assets/gallery/qr.png) ---------- */
 function initQrCode() {
-  // Uses the real QR code supplied at assets/gallery/qr.png (already encodes the
-  // venue's Google Maps link) rather than generating one from weddingData.
   const qrImage = document.getElementById('qrImage');
   const placeholder = document.getElementById('qrPlaceholderText');
   if (!qrImage) return;
@@ -222,8 +274,6 @@ function initRsvp() {
     response.textContent = text;
   };
 
-  // Opens a WhatsApp chat with `weddingData.whatsappNumber`, pre-filled with the
-  // given message. Falls back to an inline note if no number is configured.
   const openWhatsApp = (message, fallbackText) => {
     if (weddingData.whatsappNumber) {
       const url = `https://wa.me/${weddingData.whatsappNumber}?text=${encodeURIComponent(message)}`;
@@ -249,14 +299,12 @@ function initRsvp() {
   });
 }
 
-/* ---------- Background music ---------- */
+/* ---------- Background music (unchanged: assets/music/music.mp3) ---------- */
 function initMusic() {
   const toggle = document.getElementById('musicToggle');
   const hint = document.getElementById('musicHint');
   if (!toggle) return;
   if (typeof Howl === 'undefined') {
-    // Howler failed to load (e.g. offline, CDN blocked) — fail quietly, same as
-    // a missing audio file.
     toggle.hidden = true;
     return;
   }
@@ -265,51 +313,31 @@ function initMusic() {
 
   const hideHint = () => { if (hint) hint.hidden = true; };
 
-  // Single source of truth for the icon: `sound.playing()` is Howler's own
-  // ground truth, read fresh every time rather than tracked in a local variable,
-  // so the icon can't drift out of sync with reality.
   const syncToggle = () => {
     if (!fileOk) return;
     toggle.hidden = false;
     const playing = sound.playing();
     toggle.setAttribute('aria-pressed', String(playing));
     toggle.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
-    if (playing) hideHint(); // music actually started — the hint has done its job
+    if (playing) hideHint();
   };
 
   const sound = new Howl({
     src: ['assets/music/music.mp3'],
     loop: true,
     preload: true,
-    // Howler's default Web Audio API mode loads files via XMLHttpRequest, which
-    // Chromium's CORS policy blocks entirely for the file:// protocol — exactly
-    // how this site is opened (double-clicking index.html). html5:true makes
-    // Howler use a plain <audio> element internally instead, which loads file://
-    // URLs the normal way media elements always have. Confirmed by testing both.
+    // html5:true is required so the file loads when the page is opened
+    // directly from disk (file://) — XHR-based Web Audio loading is
+    // blocked there by Chromium's CORS policy.
     html5: true,
     onplay: syncToggle,
     onpause: syncToggle,
     onstop: syncToggle,
-    // assets/music/music.mp3 missing or unplayable: hide the toggle (and hint)
-    // entirely.
     onloaderror: () => { fileOk = false; toggle.hidden = true; hideHint(); },
-    // Confirmed blocked by the browser's autoplay policy (not assumed — this
-    // only fires when the browser actually rejects play()).
-    //
-    // Howler.autoUnlock (its own built-in retry-on-interaction mechanism) is
-    // tied to resuming the shared Web Audio API AudioContext, and does not
-    // apply to sounds loaded in html5:true mode — the mode this file requires
-    // to load at all under file://. Verified directly: with autoUnlock alone,
-    // clicking the toggle button played the track, but clicking or tapping
-    // anywhere else on the page did not. So the document-level retry below is
-    // written explicitly, calling the same public sound.play() from inside a
-    // genuine interaction handler — not a bypass, the same sanctioned pattern,
-    // just not left to a library mechanism that doesn't cover this mode.
     onplayerror: () => {
       syncToggle();
       if (hint && fileOk) {
         hint.hidden = false;
-        // Restart the CSS fade-in/out animation each time this fires.
         hint.style.animation = 'none';
         void hint.offsetWidth;
         hint.style.animation = '';
@@ -317,21 +345,15 @@ function initMusic() {
     },
   });
 
-  // Attempt real (audible) playback immediately on load. Never assumed to have
-  // succeeded — `sound.playing()` and the callbacks above are the only sources
-  // of truth for whether it's actually audible.
+  // Attempt real (audible) playback on load; the browser may reject it.
   sound.play();
 
-  // Retry at the first permitted interaction anywhere on the page. Listens for
-  // 'click', 'touchend' and 'keydown' — the events browsers actually treat as
-  // genuine activation for media playback — not 'pointerdown'/'touchstart'
-  // (gesture *start*), which iOS Safari in particular doesn't honor for audio.
-  // Stays attached (not {once:true}) until playback is actually confirmed, so a
-  // failed attempt is retried on the next interaction rather than giving up.
+  // Retry at the first genuine interaction anywhere on the page — this
+  // includes the "Open Invitation" button on the intro gate, so music
+  // starts exactly when the invitation is opened.
   const INTERACTION_EVENTS = ['click', 'touchend', 'keydown'];
   const onInteraction = (event) => {
     if (sound.playing() || !fileOk) return;
-    // The toggle has its own click handler below, so it isn't double-handled.
     if (event.target && event.target.closest && event.target.closest('#musicToggle')) return;
     sound.play();
   };
@@ -347,5 +369,5 @@ function initMusic() {
     hideHint();
   });
 
-  syncToggle(); // initial paint
+  syncToggle();
 }
