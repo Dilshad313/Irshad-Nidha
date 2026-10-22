@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Irshad &amp; Nidha | Wedding Invitation</title>
 <meta name="description" content="You are warmly invited to celebrate the blessed Nikah of Irshad &amp; Nidha.">
-<meta name="theme-color" content="#123F36">
+<meta name="theme-color" content="#0D1F3C">
 
 <!-- Open Graph -->
 <meta property="og:title" content="Irshad &amp; Nidha | Wedding Invitation">
@@ -14,7 +14,7 @@
 <!-- Add a real hosted image URL here before sharing, e.g.: <meta property="og:image" content="https://your-domain.com/assets/share.jpg"> -->
 
 <!-- Favicon: a simple gold crescent & star, inline so no extra file is needed -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23123F36'/%3E%3Cpath d='M38 16a18 18 0 1 0 0 32 14 14 0 1 1 0-32z' fill='%23C9A24A'/%3E%3Cpath d='M46 16l2.2 4.6L53 22l-4.8 1.4L46 28l-2.2-4.6L39 22l4.8-1.4z' fill='%23C9A24A'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230D1F3C'/%3E%3Cpath d='M38 16a18 18 0 1 0 0 32 14 14 0 1 1 0-32z' fill='%23D4AF37'/%3E%3Cpath d='M46 16l2.2 4.6L53 22l-4.8 1.4L46 28l-2.2-4.6L39 22l4.8-1.4z' fill='%23D4AF37'/%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,7 +56,6 @@
       <a href="#families">Families</a>
       <a href="#nikah">Reception</a>
       <a href="#location">Location</a>
-      <a href="#rsvp">RSVP</a>
     </nav>
 
     <div class="nav-actions">
@@ -78,16 +77,20 @@
 
   <!-- ============ 1. HERO ============ -->
   <section class="section hero" id="hero" aria-label="Opening">
-    <div class="lanterns" aria-hidden="true">
-      <span class="lantern lantern-1"></span>
-      <span class="lantern lantern-2"></span>
-      <span class="lantern lantern-3"></span>
+    <div class="falling-petals" aria-hidden="true">
+      <span class="petal petal-1"></span>
+      <span class="petal petal-2"></span>
+      <span class="petal petal-3"></span>
+      <span class="petal petal-4"></span>
+      <span class="petal petal-5"></span>
     </div>
 
     <div class="sparkles" id="heroSparkles" data-count="20" aria-hidden="true"></div>
     <div class="pattern-overlay" aria-hidden="true"></div>
 
     <div class="arch-frame">
+      <div class="floral-crest" aria-hidden="true"></div>
+
       <p class="bismillah" lang="ar" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</p>
       <p class="bismillah-translation">In the Name of Allah, the Most Gracious, the Most Merciful</p>
 
@@ -107,6 +110,8 @@
         Together with their families,<br>
         we invite you to celebrate the blessed occasion of their Nikah.
       </p>
+
+      <div class="floral-divider" aria-hidden="true"></div>
     </div>
 
     <a href="#couple" class="scroll-cue" aria-label="Scroll to next section">
@@ -263,21 +268,6 @@
     </div>
   </section>
 
-  <!-- ============ 10. RSVP ============ -->
-  <section class="section rsvp" id="rsvp" aria-labelledby="rsvpHeading">
-    <div class="container narrow">
-      <p class="eyebrow reveal light">Kindly Respond</p>
-      <h2 class="section-title light reveal" id="rsvpHeading">Will You Join Us?</h2>
-
-      <div class="rsvp-actions reveal">
-        <button type="button" class="btn btn-gold" id="rsvpYes">Yes, I&rsquo;ll Be There</button>
-        <button type="button" class="btn btn-outline-light" id="rsvpNo">Sorry, I Can&rsquo;t Attend</button>
-      </div>
-
-      <p class="rsvp-response" id="rsvpResponse" role="status" aria-live="polite" hidden></p>
-    </div>
-  </section>
-
   <!-- ============ 12. FINAL ============ -->
   <section class="section final" aria-label="Closing">
     <div class="pattern-overlay" aria-hidden="true"></div>
@@ -294,6 +284,11 @@
   </section>
 
 </main>
+
+<!-- Celebration layer: fireworks + confetti, drawn on a single full-screen
+     canvas. Purely decorative, never intercepts clicks. Skipped entirely
+     for prefers-reduced-motion users (see initCelebration in script.js). -->
+<canvas id="fxCanvas" class="fx-canvas" aria-hidden="true"></canvas>
 
 <!-- Background music (assets/music/music.mp3) is managed entirely by Howler.js in
      script.js — no <audio> element here, so there is only ever one audio instance. -->

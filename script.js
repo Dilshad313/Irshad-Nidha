@@ -24,10 +24,7 @@ const weddingData = {
   weddingDateISO: "2026-11-29T10:30:00+05:30",
 
   // Full Google Maps link to the venue. Leave empty until confirmed.
-  googleMapsUrl: "",
-
-  // WhatsApp number in international format, digits only.
-  whatsappNumber: "918138040466"
+  googleMapsUrl: ""
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,9 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initCountdown();
   initLocation();
   initQrCode();
-  initRsvp();
   initMusic();
   initSparkles();
+  initCelebration();
+  initPopEffects();
 });
 
 /* ---------- Fill the page from weddingData ---------- */
@@ -91,6 +89,7 @@ function initGate() {
     gate.classList.add('opened');
     // The first genuine interaction also unlocks background music via the
     // document-level listener in initMusic() — nothing extra needed here.
+    document.dispatchEvent(new CustomEvent('invitation:open'));
     setTimeout(() => gate.remove(), 1700);
   };
 
@@ -214,6 +213,7 @@ function initCountdown() {
       grid.hidden = true;
       message.hidden = false;
       message.textContent = 'Alhamdulillah — The Day Has Arrived!';
+      document.dispatchEvent(new CustomEvent('countdown:done'));
       return;
     }
     const days = Math.floor(diff / 86400000);
@@ -259,43 +259,6 @@ function initQrCode() {
   qrImage.addEventListener('error', () => {
     qrImage.hidden = true;
     placeholder.hidden = false;
-  });
-}
-
-/* ---------- RSVP ---------- */
-function initRsvp() {
-  const yesBtn = document.getElementById('rsvpYes');
-  const noBtn = document.getElementById('rsvpNo');
-  const response = document.getElementById('rsvpResponse');
-  if (!yesBtn || !noBtn || !response) return;
-
-  const show = (text) => {
-    response.hidden = false;
-    response.textContent = text;
-  };
-
-  const openWhatsApp = (message, fallbackText) => {
-    if (weddingData.whatsappNumber) {
-      const url = `https://wa.me/${weddingData.whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank', 'noopener');
-      show('Redirecting you to WhatsApp — please send the pre-filled message to confirm.');
-    } else {
-      show(fallbackText);
-    }
-  };
-
-  yesBtn.addEventListener('click', () => {
-    openWhatsApp(
-      `Hello, I'm happy to confirm that I'll attend the wedding of ${weddingData.groom} and ${weddingData.bride}.`,
-      'Shukran! Please let the family know directly — RSVP via WhatsApp is coming soon.'
-    );
-  });
-
-  noBtn.addEventListener('click', () => {
-    openWhatsApp(
-      `Hello, I'm sorry that I won't be able to attend the wedding of ${weddingData.groom} and ${weddingData.bride}.`,
-      'Thank you for letting us know. We will miss you — please keep us in your duas.'
-    );
   });
 }
 
@@ -370,4 +333,192 @@ function initMusic() {
   });
 
   syncToggle();
+}
+
+/* ---------- Celebration: fireworks + confetti on a single canvas ----------
+   Fires on the 'invitation:open' event (dispatched by initGate when the
+   gate opens) and again on 'countdown:done' (dispatched by initCountdown
+   when the big day arrives). Fully skipped for prefers-reduced-motion. */
+function initCelebration() {
+  const canvas = document.getElementById('fxCanvas');
+  if (!canvas) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    canvas.remove();
+    return;
+  }
+
+  const ctx = canvas.getContext('2d');
+  const COLORS = ['#FF6F91', '#FFD36E', '#7FE7C4', '#7EC8E3', '#FFF3E2', '#D9A86C'];
+
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let width = 0;
+  let height = 0;
+
+  const resize = () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  resize();
+  window.addEventListener('resize', resize);
+
+  let sparks = [];
+  let confetti = [];
+  let rafId = null;
+
+  const rand = (min, max) => min + Math.random() * (max - min);
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+  function spawnFirework(x, y) {
+    const count = 44 + Math.floor(Math.random() * 20);
+    const baseColor = pick(COLORS);
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + rand(-0.12, 0.12);
+      const speed = rand(2.2, 5.4);
+      sparks.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 0,
+        maxLife: rand(50, 80),
+        color: Math.random() < 0.3 ? pick(COLORS) : baseColor,
+        size: rand(1.6, 3.2)
+      });
+    }
+  }
+
+  function spawnConfetti(total) {
+    for (let i = 0; i < total; i++) {
+      confetti.push({
+        x: rand(0, width),
+        y: rand(-120, -10),
+        vx: rand(-1.1, 1.1),
+        vy: rand(1.6, 3.6),
+        rot: rand(0, Math.PI * 2),
+        vr: rand(-0.14, 0.14),
+        size: rand(5, 10),
+        color: pick(COLORS),
+        shape: Math.random() < 0.5 ? 'rect' : 'circle',
+        life: 0,
+        maxLife: rand(260, 420)
+      });
+    }
+  }
+
+  function tick() {
+    rafId = requestAnimationFrame(tick);
+    ctx.clearRect(0, 0, width, height);
+
+    sparks = sparks.filter((p) => p.life < p.maxLife);
+    sparks.forEach((p) => {
+      p.life++;
+      p.vy += 0.045;
+      p.vx *= 0.985;
+      p.vy *= 0.99;
+      p.x += p.vx;
+      p.y += p.vy;
+      const fade = Math.max(1 - p.life / p.maxLife, 0);
+      ctx.globalAlpha = fade;
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.arc(p.x, p.y, p.size * fade + 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    confetti = confetti.filter((c) => c.life < c.maxLife && c.y < height + 30);
+    confetti.forEach((c) => {
+      c.life++;
+      c.x += c.vx;
+      c.y += c.vy;
+      c.rot += c.vr;
+      const fade = c.life > c.maxLife - 60 ? Math.max((c.maxLife - c.life) / 60, 0) : 1;
+      ctx.globalAlpha = fade;
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.rot);
+      ctx.fillStyle = c.color;
+      if (c.shape === 'rect') {
+        ctx.fillRect(-c.size / 2, -c.size / 3, c.size, c.size * 0.6);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, c.size / 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    });
+
+    ctx.globalAlpha = 1;
+
+    if (sparks.length === 0 && confetti.length === 0) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  }
+
+  function ensureLoop() {
+    if (!rafId) rafId = requestAnimationFrame(tick);
+  }
+
+  function celebrateOpen() {
+    const bursts = [
+      { x: width * 0.22, y: height * 0.3, delay: 0 },
+      { x: width * 0.78, y: height * 0.24, delay: 260 },
+      { x: width * 0.5, y: height * 0.18, delay: 520 },
+      { x: width * 0.35, y: height * 0.4, delay: 850 }
+    ];
+    bursts.forEach((b) => setTimeout(() => spawnFirework(b.x, b.y), b.delay));
+    spawnConfetti(90);
+    setTimeout(() => spawnConfetti(60), 500);
+    ensureLoop();
+  }
+
+  function celebrateMilestone() {
+    spawnFirework(width * 0.3, height * 0.3);
+    spawnFirework(width * 0.7, height * 0.35);
+    setTimeout(() => spawnFirework(width * 0.5, height * 0.22), 300);
+    spawnConfetti(70);
+    ensureLoop();
+  }
+
+  document.addEventListener('invitation:open', celebrateOpen);
+  document.addEventListener('countdown:done', celebrateMilestone);
+}
+
+/* ---------- Pop effect: small confetti burst on button taps ---------- */
+function initPopEffects() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const POP_COLORS = ['#FF6F91', '#FFD36E', '#7FE7C4', '#7EC8E3', '#D9A86C'];
+  const POP_TARGETS = '.btn, .gate-open-btn, .music-toggle';
+
+  const burst = (x, y) => {
+    const count = 10;
+    for (let i = 0; i < count; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'pop-particle';
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+      const distance = 26 + Math.random() * 30;
+      dot.style.left = x + 'px';
+      dot.style.top = y + 'px';
+      dot.style.background = POP_COLORS[Math.floor(Math.random() * POP_COLORS.length)];
+      dot.style.setProperty('--pop-x1', (Math.cos(angle) * distance).toFixed(1) + 'px');
+      dot.style.setProperty('--pop-y1', (Math.sin(angle) * distance).toFixed(1) + 'px');
+      dot.style.setProperty('--pop-duration', (0.5 + Math.random() * 0.3).toFixed(2) + 's');
+      document.body.appendChild(dot);
+      dot.addEventListener('animationend', () => dot.remove(), { once: true });
+    }
+  };
+
+  document.addEventListener('click', (event) => {
+    const target = event.target.closest(POP_TARGETS);
+    if (!target || target.disabled) return;
+    burst(event.clientX, event.clientY);
+    target.classList.remove('is-popping');
+    void target.offsetWidth;
+    target.classList.add('is-popping');
+  });
 }

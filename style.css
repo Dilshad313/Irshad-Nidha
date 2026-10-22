@@ -3,19 +3,26 @@
    ========================================================= */
 
 :root {
-  /* Core palette */
-  --primary-green: #123F36;
-  --deep-green: #082B25;
-  --green-soft: #1C5346;
-  --gold: #C9A24A;
-  --gold-light: #E3C878;
-  --gold-pale: #F0DDA8;
-  --gold-deep: #8C6D2F;
-  --cream: #F7F1E3;
-  --cream-soft: #FBF8F0;
-  --text-dark: #17352F;
-  --text-on-dark: #F3ECD8;
+  /* Core palette — royal blue & gold */
+  --primary-green: #1B3A6B;
+  --deep-green: #0D1F3C;
+  --green-soft: #2C5282;
+  --gold: #D4AF37;
+  --gold-light: #E8CC6B;
+  --gold-pale: #F2E3AE;
+  --gold-deep: #9C7A24;
+  --cream: #F5F2E8;
+  --cream-soft: #FFFDF7;
+  --text-dark: #0D1F3C;
+  --text-on-dark: #ECE8D8;
   --white: #FFFFFF;
+
+  /* Celebration accents (fireworks / confetti) */
+  --fx-rose: #FF6F91;
+  --fx-gold: #FFD36E;
+  --fx-mint: #7FE7C4;
+  --fx-sky: #7EC8E3;
+  --fx-cream: #FFF3E2;
 
   /* Fonts */
   --font-display: 'Playfair Display', serif;
@@ -27,8 +34,8 @@
 
   /* Spacing / shape */
   --radius: 10px;
-  --shadow-soft: 0 12px 44px rgba(4, 20, 17, 0.45);
-  --shadow-gold: 0 4px 22px rgba(201, 162, 74, 0.4);
+  --shadow-soft: 0 12px 44px rgba(4, 10, 20, 0.45);
+  --shadow-gold: 0 4px 22px rgba(212, 175, 55, 0.4);
   --max-width: 1140px;
   --transition: 0.35s ease;
   --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
@@ -78,7 +85,15 @@ html { scrollbar-color: var(--gold) var(--deep-green); scrollbar-width: thin; }
 .container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
 .container.narrow { max-width: 720px; }
 
-.section { position: relative; padding: clamp(4rem, 9vw, 7.5rem) 0; overflow: hidden; }
+.section {
+  position: relative;
+  padding: clamp(4rem, 9vw, 7.5rem) 0;
+  overflow: hidden;
+  /* Clears the fixed nav bar when jumping to a section via an anchor link
+     (nav links, skip-link) — without this the section's heading lands
+     partly hidden under the bar. */
+  scroll-margin-top: 84px;
+}
 
 .eyebrow {
   font-family: var(--font-sans);
@@ -125,13 +140,13 @@ html { scrollbar-color: var(--gold) var(--deep-green); scrollbar-width: thin; }
   color: var(--gold);
   font-size: 1.3rem;
   margin: 1.2rem 0;
-  text-shadow: 0 0 14px rgba(201, 162, 74, 0.6);
+  text-shadow: 0 0 14px rgba(212, 175, 55, 0.6);
 }
 
 /* ---------- Pattern overlay ---------- */
 .pattern-overlay {
   position: absolute; inset: 0; pointer-events: none; opacity: 0.09;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23C9A24A' stroke-width='1'%3E%3Cpath d='M40 2 L78 40 L40 78 L2 40 Z'/%3E%3Ccircle cx='40' cy='40' r='18'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23D4AF37' stroke-width='1'%3E%3Cpath d='M40 2 L78 40 L40 78 L2 40 Z'/%3E%3Ccircle cx='40' cy='40' r='18'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 80px 80px;
 }
 
@@ -166,15 +181,13 @@ html { scrollbar-color: var(--gold) var(--deep-green); scrollbar-width: thin; }
   color: var(--deep-green);
   box-shadow: var(--shadow-gold);
 }
-.btn-gold:hover, .btn-gold:focus-visible { box-shadow: 0 10px 30px rgba(201, 162, 74, 0.55); }
+.btn-gold:hover, .btn-gold:focus-visible { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.55); }
 .btn-gold:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
-.btn-outline { background: transparent; border-color: var(--primary-green); color: var(--primary-green); }
-.btn-outline:hover, .btn-outline:focus-visible { background: var(--primary-green); color: var(--cream); }
-
-.btn-outline-light { background: transparent; border-color: var(--gold-light); color: var(--cream); }
-.btn-outline-light:hover, .btn-outline:focus-visible { }
-.btn-outline-light:hover, .btn-outline-light:focus-visible { background: var(--gold-light); color: var(--deep-green); }
+/* Only ever used on the dark QR card, so it's styled light-on-dark rather
+   than the dark-on-light its name suggests — avoids low-contrast text. */
+.btn-outline { background: transparent; border-color: var(--gold-light); color: var(--cream); }
+.btn-outline:hover, .btn-outline:focus-visible { background: var(--gold-light); color: var(--deep-green); }
 
 /* ---------- Reveal-on-scroll ---------- */
 .reveal {
@@ -199,8 +212,8 @@ body.gate-active { overflow: hidden; }
 .curtain {
   position: absolute; top: 0; bottom: 0; width: 50.5%;
   background:
-    radial-gradient(120% 60% at 50% 0%, rgba(201,162,74,0.10), transparent 60%),
-    linear-gradient(180deg, #0C3A31, var(--deep-green) 70%);
+    radial-gradient(120% 60% at 50% 0%, rgba(212,175,55,0.10), transparent 60%),
+    linear-gradient(180deg, #1E3F72, var(--deep-green) 70%);
   transition: transform 1.5s var(--ease-lux);
   will-change: transform;
 }
@@ -220,7 +233,7 @@ body.gate-active { overflow: hidden; }
 
 .gate-pattern {
   position: absolute; inset: 0; pointer-events: none; opacity: 0.12;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23C9A24A' stroke-width='1'%3E%3Cpath d='M40 2 L78 40 L40 78 L2 40 Z'/%3E%3Ccircle cx='40' cy='40' r='18'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23D4AF37' stroke-width='1'%3E%3Cpath d='M40 2 L78 40 L40 78 L2 40 Z'/%3E%3Ccircle cx='40' cy='40' r='18'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 80px 80px;
 }
 
@@ -258,8 +271,8 @@ body.gate-active { overflow: hidden; }
   font-family: var(--font-heading);
   font-size: 2rem;
   color: var(--cream);
-  background: radial-gradient(circle at 50% 30%, rgba(201,162,74,0.18), rgba(201,162,74,0.02));
-  box-shadow: 0 0 40px rgba(201, 162, 74, 0.25), inset 0 0 24px rgba(201, 162, 74, 0.12);
+  background: radial-gradient(circle at 50% 30%, rgba(212,175,55,0.18), rgba(212,175,55,0.02));
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.25), inset 0 0 24px rgba(212, 175, 55, 0.12);
   opacity: 0;
   animation: gateRise 1s var(--ease-lux) 0.55s forwards;
 }
@@ -267,7 +280,7 @@ body.gate-active { overflow: hidden; }
   content: '';
   position: absolute; inset: -11px;
   border-radius: 50%;
-  border: 1px dashed rgba(201, 162, 74, 0.5);
+  border: 1px dashed rgba(212, 175, 55, 0.5);
   animation: spin 26s linear infinite;
 }
 .gm-amp { color: var(--gold); font-family: var(--font-display); font-style: italic; }
@@ -278,7 +291,7 @@ body.gate-active { overflow: hidden; }
   font-size: clamp(3rem, 10vw, 4.6rem);
   color: var(--cream);
   line-height: 1.15;
-  text-shadow: 0 0 30px rgba(201, 162, 74, 0.35);
+  text-shadow: 0 0 30px rgba(212, 175, 55, 0.35);
   opacity: 0;
   animation: gateRise 1s var(--ease-lux) 0.8s forwards, nameGlow 4.5s ease-in-out 2.2s infinite;
 }
@@ -308,7 +321,7 @@ body.gate-active { overflow: hidden; }
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  box-shadow: 0 8px 30px rgba(201, 162, 74, 0.45);
+  box-shadow: 0 8px 30px rgba(212, 175, 55, 0.45);
   transition: transform 0.35s var(--ease-lux), box-shadow 0.35s var(--ease-lux);
   opacity: 0;
   animation: gateRise 0.9s var(--ease-lux) 1.3s forwards;
@@ -328,7 +341,7 @@ body.gate-active { overflow: hidden; }
 }
 .gate-open-btn:hover, .gate-open-btn:focus-visible {
   transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 14px 44px rgba(201, 162, 74, 0.6);
+  box-shadow: 0 14px 44px rgba(212, 175, 55, 0.6);
 }
 .gate-note {
   margin-top: 1.1rem;
@@ -373,7 +386,7 @@ body.gate-active { overflow: hidden; }
   background: rgba(6, 32, 27, 0.88);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(201, 162, 74, 0.28);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.28);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 .nav-inner {
@@ -411,12 +424,12 @@ body.gate-active { overflow: hidden; }
 
 .music-toggle {
   width: 38px; height: 38px; border-radius: 50%;
-  border: 1px solid rgba(201, 162, 74, 0.55);
+  border: 1px solid rgba(212, 175, 55, 0.55);
   background: transparent; color: var(--gold-light);
   display: flex; align-items: center; justify-content: center;
   transition: background var(--transition), box-shadow var(--transition);
 }
-.music-toggle:hover, .music-toggle:focus-visible { background: rgba(201, 162, 74, 0.16); box-shadow: 0 0 16px rgba(201,162,74,0.3); }
+.music-toggle:hover, .music-toggle:focus-visible { background: rgba(212, 175, 55, 0.16); box-shadow: 0 0 16px rgba(212,175,55,0.3); }
 .music-toggle[aria-pressed="true"] .music-icon { animation: spin 3s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -431,7 +444,7 @@ body.gate-active { overflow: hidden; }
   font-size: 0.72rem;
   padding: 0.45rem 0.8rem;
   border-radius: 999px;
-  border: 1px solid rgba(201, 162, 74, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.5);
   box-shadow: var(--shadow-soft);
   pointer-events: none;
   opacity: 0;
@@ -442,8 +455,8 @@ body.gate-active { overflow: hidden; }
   position: absolute; top: -5px; right: 1.1rem;
   width: 8px; height: 8px;
   background: var(--deep-green);
-  border-left: 1px solid rgba(201, 162, 74, 0.5);
-  border-top: 1px solid rgba(201, 162, 74, 0.5);
+  border-left: 1px solid rgba(212, 175, 55, 0.5);
+  border-top: 1px solid rgba(212, 175, 55, 0.5);
   transform: rotate(45deg);
 }
 @keyframes hintFade {
@@ -480,10 +493,10 @@ body.gate-active { overflow: hidden; }
     transition: max-height var(--transition), opacity var(--transition), padding var(--transition);
   }
   .nav-links.open {
-    max-height: 70vh; overflow-y: auto;
+    max-height: 70vh; max-height: 70dvh; overflow-y: auto;
     padding: 1rem 1.5rem 1.5rem;
     opacity: 1; pointer-events: auto;
-    border-bottom: 1px solid rgba(201, 162, 74, 0.25);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.25);
   }
   .hamburger { display: flex; }
 }
@@ -492,65 +505,110 @@ body.gate-active { overflow: hidden; }
    HERO
    ========================================================= */
 .hero {
+  /* 100dvh (where supported) tracks the browser's real visible viewport,
+     so the hero doesn't resize/jump as the mobile address bar shows and
+     hides while scrolling — 100vh stays as the fallback for older browsers. */
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex; align-items: center; justify-content: center;
   background:
-    radial-gradient(circle at 50% 118%, rgba(201, 162, 74, 0.14), transparent 55%),
+    radial-gradient(circle at 50% 8%, rgba(244, 227, 201, 0.10), transparent 42%),
+    radial-gradient(circle at 50% 118%, rgba(212, 175, 55, 0.16), transparent 55%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.22) 100%),
     radial-gradient(circle at 50% 0%, var(--green-soft) 0%, var(--primary-green) 45%, var(--deep-green) 100%);
   padding-top: 6rem;
   text-align: center;
 }
 
-.lanterns { position: absolute; inset: 0; pointer-events: none; }
-.lantern {
+/* ---- Ambient falling petals (whole hero, very subtle) ---- */
+.falling-petals { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+.petal {
   position: absolute;
-  width: 26px; height: 36px;
-  top: 10%;
-  border-radius: 40% 40% 50% 50%;
-  background: linear-gradient(180deg, var(--gold-pale), var(--gold));
-  box-shadow: 0 0 22px rgba(201, 162, 74, 0.65);
-  animation: float 6s ease-in-out infinite;
+  top: -40px;
+  width: 16px; height: 18px;
+  background: url("assets/floral/petal.svg") center / contain no-repeat;
+  opacity: 0;
+  animation: petalFall linear infinite;
 }
-.lantern::before {
-  content: '';
-  position: absolute; top: -10px; left: 50%;
-  width: 1px; height: 10px;
-  background: var(--gold-light);
-  transform: translateX(-50%);
+@keyframes petalFall {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  8%   { opacity: 0.85; }
+  92%  { opacity: 0.6; }
+  100% {
+    opacity: 0;
+    /* lvh (largest viewport height) is used here instead of dvh/vh on
+       purpose: it stays constant while the mobile address bar shows/hides,
+       so a petal mid-fall never visibly snaps to a new end point. */
+    transform: translate(var(--petal-drift, 40px), 112vh) rotate(300deg);
+    transform: translate(var(--petal-drift, 40px), 112lvh) rotate(300deg);
+  }
 }
-.lantern-1 { left: 8%; animation-delay: 0s; }
-.lantern-2 { left: 85%; top: 18%; animation-delay: 1.5s; }
-.lantern-3 { left: 46%; top: 6%; width: 20px; height: 28px; animation-delay: 3s; }
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(16px); }
+.petal-1 { left: 10%; width: 13px; height: 15px; animation-duration: 15s; animation-delay: 0s;  --petal-drift: 60px; }
+.petal-2 { left: 30%; width: 17px; height: 19px; animation-duration: 19s; animation-delay: 4s;  --petal-drift: -50px; }
+.petal-3 { left: 56%; width: 12px; height: 14px; animation-duration: 17s; animation-delay: 8s;  --petal-drift: 40px; }
+.petal-4 { left: 74%; width: 16px; height: 18px; animation-duration: 21s; animation-delay: 2s;  --petal-drift: -65px; }
+.petal-5 { left: 89%; width: 14px; height: 16px; animation-duration: 16s; animation-delay: 11s; --petal-drift: 30px; }
+@media (prefers-reduced-motion: reduce) {
+  .falling-petals { display: none; }
 }
-@media (max-width: 600px) { .lantern-3 { display: none; } }
+
+/* ---- Floral crest: the premium central bouquet sitting atop the card ---- */
+.floral-crest {
+  position: absolute;
+  top: clamp(-150px, -17vw, -80px);
+  left: 50%;
+  width: clamp(220px, 48vw, 360px);
+  aspect-ratio: 340 / 150;
+  background: url("assets/floral/crest.svg") center / contain no-repeat;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.35)) drop-shadow(0 0 26px rgba(212, 175, 55, 0.18));
+  pointer-events: none;
+  z-index: 3;
+  animation: crestSway 9s ease-in-out infinite;
+}
+@keyframes crestSway {
+  0%, 100% { transform: translateX(-50%) rotate(-0.6deg); }
+  50%      { transform: translateX(-50%) rotate(0.6deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .floral-crest { animation: none; transform: translateX(-50%); }
+}
+
+/* ---- Floral divider: small closing flourish under the invite text ---- */
+.floral-divider {
+  width: clamp(78px, 20vw, 116px);
+  aspect-ratio: 120 / 70;
+  margin: 1.6rem auto 0;
+  background: url("assets/floral/divider.svg") center / contain no-repeat;
+  opacity: 0.92;
+}
 
 .arch-frame {
   position: relative;
   z-index: 2;
   max-width: 560px;
   margin: 0 2rem;
-  padding: clamp(2.2rem, 6vw, 3.5rem) clamp(1.5rem, 5vw, 3rem) 3rem;
-  background: rgba(247, 241, 227, 0.05);
-  backdrop-filter: blur(3px);
+  padding: clamp(2.8rem, 7vw, 4.2rem) clamp(1.5rem, 5vw, 3rem) 3rem;
+  background:
+    linear-gradient(180deg, rgba(245, 242, 232, 0.08), rgba(245, 242, 232, 0.03)),
+    rgba(245, 242, 232, 0.04);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: 1px solid var(--gold);
   border-radius: 50% 50% 10px 10px / 22% 22% 10px 10px;
   animation: frameGlow 5s ease-in-out infinite;
 }
 @keyframes frameGlow {
-  0%, 100% { box-shadow: inset 0 0 0 1px rgba(201, 162, 74, 0.22), 0 0 34px rgba(201, 162, 74, 0.10), var(--shadow-soft); }
-  50%      { box-shadow: inset 0 0 0 1px rgba(201, 162, 74, 0.4),  0 0 54px rgba(201, 162, 74, 0.22), var(--shadow-soft); }
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.22), 0 0 34px rgba(212, 175, 55, 0.10), var(--shadow-soft); }
+  50%      { box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.4),  0 0 54px rgba(212, 175, 55, 0.22), var(--shadow-soft); }
 }
-.arch-frame::before {
-  content: '\25C6';
-  position: absolute; top: -14px; left: 50%;
-  transform: translateX(-50%);
-  color: var(--gold);
-  background: var(--primary-green);
-  padding: 0 0.4rem;
-  font-size: 0.9rem;
+/* Fine inner hairline — echoes the outer arch a little further in for a
+   "frame within a frame" look, matching the qr-card's inset border. */
+.arch-frame::after {
+  content: '';
+  position: absolute; inset: 11px;
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  border-radius: 50% 50% 6px 6px / 20% 20% 6px 6px;
+  pointer-events: none;
 }
 
 .bismillah {
@@ -574,7 +632,19 @@ body.gate-active { overflow: hidden; }
   text-transform: uppercase;
   color: var(--gold);
   margin-bottom: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
 }
+.blessing-line::before, .blessing-line::after {
+  content: '';
+  height: 1px;
+  width: clamp(16px, 5vw, 42px);
+  flex-shrink: 0;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.blessing-line::after { background: linear-gradient(90deg, var(--gold), transparent); }
 
 .couple-names { margin-bottom: 1.6rem; }
 .name {
@@ -619,15 +689,15 @@ body.gate-active { overflow: hidden; }
 /* =========================================================
    COUPLE
    ========================================================= */
-.couple { background: var(--primary-green); text-align: center; }
+.couple { background: var(--deep-green); text-align: center; }
 .couple::before {
   content: '&';
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -55%);
   font-family: var(--font-script);
-  font-size: clamp(16rem, 42vw, 30rem);
-  color: rgba(201, 162, 74, 0.05);
+  font-size: clamp(8rem, 42vw, 30rem);
+  color: rgba(212, 175, 55, 0.05);
   pointer-events: none;
   line-height: 1;
 }
@@ -643,7 +713,7 @@ body.gate-active { overflow: hidden; }
    FAMILIES
    ========================================================= */
 .families {
-  background: linear-gradient(180deg, var(--deep-green), var(--primary-green));
+  background: var(--deep-green);
   color: var(--cream);
   text-align: center;
 }
@@ -657,8 +727,8 @@ body.gate-active { overflow: hidden; }
   flex: 1 1 220px;
   max-width: 290px;
   padding: 2.2rem 1.4rem;
-  background: linear-gradient(180deg, rgba(247, 241, 227, 0.07), rgba(247, 241, 227, 0.02));
-  border: 1px solid rgba(201, 162, 74, 0.35);
+  background: linear-gradient(180deg, rgba(245, 242, 232, 0.07), rgba(245, 242, 232, 0.02));
+  border: 1px solid rgba(212, 175, 55, 0.35);
   border-radius: var(--radius);
   position: relative;
   transition: transform 0.45s var(--ease-lux), box-shadow 0.45s var(--ease-lux), border-color 0.45s ease;
@@ -672,8 +742,8 @@ body.gate-active { overflow: hidden; }
 }
 .family-card:hover {
   transform: translateY(-8px);
-  border-color: rgba(201, 162, 74, 0.7);
-  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.4), 0 0 34px rgba(201, 162, 74, 0.14);
+  border-color: rgba(212, 175, 55, 0.7);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.4), 0 0 34px rgba(212, 175, 55, 0.14);
 }
 .family-role {
   font-family: var(--font-sans);
@@ -690,7 +760,7 @@ body.gate-active { overflow: hidden; }
 }
 .family-of { font-size: 0.85rem; color: var(--gold-light); margin-bottom: 0.3rem; }
 .family-parents { font-size: 0.95rem; line-height: 1.7; }
-.family-sep { color: var(--gold); font-size: 1.6rem; text-shadow: 0 0 16px rgba(201,162,74,0.55); }
+.family-sep { color: var(--gold); font-size: 1.6rem; text-shadow: 0 0 16px rgba(212,175,55,0.55); }
 
 /* =========================================================
    NIKAH DETAILS
@@ -698,8 +768,8 @@ body.gate-active { overflow: hidden; }
 .nikah { background: var(--deep-green); }
 .event-card {
   margin-top: 2.4rem;
-  background: linear-gradient(180deg, rgba(247, 241, 227, 0.06), rgba(247, 241, 227, 0.02));
-  border: 1px solid rgba(201, 162, 74, 0.4);
+  background: linear-gradient(180deg, rgba(245, 242, 232, 0.06), rgba(245, 242, 232, 0.02));
+  border: 1px solid rgba(212, 175, 55, 0.4);
   border-radius: var(--radius);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
@@ -707,7 +777,7 @@ body.gate-active { overflow: hidden; }
 .event-row {
   display: flex; justify-content: space-between; gap: 1rem;
   padding: 1.05rem 1.6rem;
-  border-bottom: 1px solid rgba(201, 162, 74, 0.16);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.16);
   position: relative;
   transition: background 0.35s ease;
 }
@@ -719,7 +789,7 @@ body.gate-active { overflow: hidden; }
   transform: scaleY(0);
   transition: transform 0.35s var(--ease-lux);
 }
-.event-row:hover { background: rgba(201, 162, 74, 0.07); }
+.event-row:hover { background: rgba(212, 175, 55, 0.07); }
 .event-row:hover::before { transform: scaleY(1); }
 .event-row:last-child { border-bottom: none; }
 .event-label {
@@ -744,7 +814,7 @@ body.gate-active { overflow: hidden; }
    LOCATION + QR
    ========================================================= */
 .location {
-  background: linear-gradient(180deg, var(--primary-green), var(--deep-green));
+  background: var(--deep-green);
   color: var(--cream);
   text-align: center;
 }
@@ -755,23 +825,23 @@ body.gate-active { overflow: hidden; }
   position: relative;
   margin: 2.6rem auto 0;
   max-width: 350px;
-  background: linear-gradient(180deg, rgba(247, 241, 227, 0.08), rgba(247, 241, 227, 0.02));
+  background: linear-gradient(180deg, rgba(245, 242, 232, 0.08), rgba(245, 242, 232, 0.02));
   border-radius: var(--radius);
   border: 1px solid var(--gold);
-  box-shadow: var(--shadow-soft), 0 0 40px rgba(201, 162, 74, 0.1);
+  box-shadow: var(--shadow-soft), 0 0 40px rgba(212, 175, 55, 0.1);
   padding: 2rem 1.6rem;
   color: var(--cream);
   transition: transform 0.45s var(--ease-lux), box-shadow 0.45s var(--ease-lux);
 }
 .qr-card:hover {
   transform: translateY(-6px);
-  box-shadow: var(--shadow-soft), 0 0 60px rgba(201, 162, 74, 0.22);
+  box-shadow: var(--shadow-soft), 0 0 60px rgba(212, 175, 55, 0.22);
 }
 /* inner fine gold frame */
 .qr-card::before {
   content: '';
   position: absolute; inset: 9px;
-  border: 1px solid rgba(201, 162, 74, 0.3);
+  border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 6px;
   pointer-events: none;
 }
@@ -796,8 +866,8 @@ body.gate-active { overflow: hidden; }
    ========================================================= */
 .countdown {
   background:
-    radial-gradient(circle at 50% 0%, rgba(201, 162, 74, 0.08), transparent 55%),
-    var(--primary-green);
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08), transparent 55%),
+    var(--deep-green);
   text-align: center;
 }
 .countdown-grid {
@@ -809,8 +879,8 @@ body.gate-active { overflow: hidden; }
 }
 .countdown-cell {
   position: relative;
-  background: linear-gradient(180deg, rgba(247, 241, 227, 0.08), rgba(247, 241, 227, 0.02));
-  border: 1px solid rgba(201, 162, 74, 0.4);
+  background: linear-gradient(180deg, rgba(245, 242, 232, 0.08), rgba(245, 242, 232, 0.02));
+  border: 1px solid rgba(212, 175, 55, 0.4);
   border-radius: var(--radius);
   padding: 1.4rem 0.4rem 1.2rem;
   box-shadow: var(--shadow-soft);
@@ -822,7 +892,7 @@ body.gate-active { overflow: hidden; }
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
-.countdown-cell:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.4), 0 0 30px rgba(201,162,74,0.16); }
+.countdown-cell:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.4), 0 0 30px rgba(212,175,55,0.16); }
 .countdown-num {
   display: block;
   font-family: var(--font-heading);
@@ -852,7 +922,7 @@ body.gate-active { overflow: hidden; }
   font-family: var(--font-script);
   font-size: clamp(1.9rem, 5.5vw, 2.8rem);
   color: var(--gold-light);
-  text-shadow: 0 0 26px rgba(201, 162, 74, 0.3);
+  text-shadow: 0 0 26px rgba(212, 175, 55, 0.3);
 }
 .quote-source {
   margin-top: 0.9rem;
@@ -867,8 +937,8 @@ body.gate-active { overflow: hidden; }
    ========================================================= */
 .message {
   background:
-    radial-gradient(circle at 50% 100%, rgba(201, 162, 74, 0.07), transparent 55%),
-    var(--primary-green);
+    radial-gradient(circle at 50% 100%, rgba(212, 175, 55, 0.07), transparent 55%),
+    var(--deep-green);
   text-align: center;
 }
 .message-text {
@@ -879,32 +949,12 @@ body.gate-active { overflow: hidden; }
 }
 
 /* =========================================================
-   RSVP
-   ========================================================= */
-.rsvp {
-  background: linear-gradient(180deg, var(--primary-green), var(--green-soft));
-  color: var(--cream);
-  text-align: center;
-}
-.rsvp-actions {
-  margin-top: 2.2rem;
-  display: flex; justify-content: center;
-  gap: 1.2rem;
-  flex-wrap: wrap;
-}
-.rsvp-response {
-  margin-top: 1.6rem;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 1.08rem;
-  color: var(--gold-light);
-}
-
-/* =========================================================
    FINAL
    ========================================================= */
 .final {
-  background: radial-gradient(circle at 50% 100%, var(--green-soft), var(--deep-green));
+  background:
+    radial-gradient(circle at 50% 100%, rgba(212, 175, 55, 0.12), transparent 60%),
+    var(--deep-green);
   color: var(--cream);
   text-align: center;
   padding-bottom: 10rem;
@@ -916,7 +966,7 @@ body.gate-active { overflow: hidden; }
   transform: translateX(-50%);
   width: min(640px, 90vw);
   height: 260px;
-  background: radial-gradient(ellipse at 50% 100%, rgba(201, 162, 74, 0.22), transparent 70%);
+  background: radial-gradient(ellipse at 50% 100%, rgba(212, 175, 55, 0.22), transparent 70%);
   pointer-events: none;
 }
 .final .container { position: relative; z-index: 1; }
@@ -941,7 +991,7 @@ body.gate-active { overflow: hidden; }
   background-position: bottom;
   background-size: 300px 90px;
   opacity: 0.9;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='90'%3E%3Cg fill='%23082B25'%3E%3Crect x='0' y='60' width='300' height='30'/%3E%3Crect x='20' y='20' width='8' height='45'/%3E%3Ccircle cx='24' cy='16' r='6'/%3E%3Crect x='272' y='20' width='8' height='45'/%3E%3Ccircle cx='276' cy='16' r='6'/%3E%3Cpath d='M110 60 L110 34 Q150 10 190 34 L190 60 Z'/%3E%3Ccircle cx='150' cy='8' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='90'%3E%3Cg fill='%230D1F3C'%3E%3Crect x='0' y='60' width='300' height='30'/%3E%3Crect x='20' y='20' width='8' height='45'/%3E%3Ccircle cx='24' cy='16' r='6'/%3E%3Crect x='272' y='20' width='8' height='45'/%3E%3Ccircle cx='276' cy='16' r='6'/%3E%3Cpath d='M110 60 L110 34 Q150 10 190 34 L190 60 Z'/%3E%3Ccircle cx='150' cy='8' r='5'/%3E%3C/g%3E%3C/svg%3E");
   animation: silhouetteBreathe 7s ease-in-out infinite;
 }
 @keyframes silhouetteBreathe { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
@@ -954,8 +1004,8 @@ body.gate-active { overflow: hidden; }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes nameGlow {
-  0%, 100% { text-shadow: 0 0 18px rgba(201, 162, 74, 0.25); }
-  50%      { text-shadow: 0 0 34px rgba(201, 162, 74, 0.55); }
+  0%, 100% { text-shadow: 0 0 18px rgba(212, 175, 55, 0.25); }
+  50%      { text-shadow: 0 0 34px rgba(212, 175, 55, 0.55); }
 }
 .arch-frame .bismillah,
 .arch-frame .bismillah-translation,
@@ -1028,6 +1078,55 @@ body.gate-open .divider-amp { animation: popIn 0.5s ease 1.55s both; }
   to   { opacity: 1; transform: translateY(0); }
 }
 .site-nav { animation: navDrop 0.6s ease both; }
+
+/* =========================================================
+   CELEBRATION EFFECTS — fireworks, confetti, pops
+   ========================================================= */
+.fx-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2200;
+  pointer-events: none;
+}
+
+/* Small "pop" burst used on button taps — lightweight DOM dots rather
+   than canvas, since they're short-lived and few at a time. */
+.pop-particle {
+  position: fixed;
+  top: 0; left: 0;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2500;
+  opacity: 1;
+  will-change: transform, opacity;
+  animation: popFly var(--pop-duration, 0.65s) cubic-bezier(0.17, 0.84, 0.44, 1) forwards;
+}
+@keyframes popFly {
+  0% {
+    transform: translate(var(--pop-x0, 0), var(--pop-y0, 0)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--pop-x1, 0), var(--pop-y1, 0)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* Gentle celebratory bounce on primary call-to-action buttons */
+@keyframes ctaPop {
+  0%   { transform: translateY(-2px) scale(1); }
+  40%  { transform: translateY(-2px) scale(1.08); }
+  100% { transform: translateY(-2px) scale(1); }
+}
+.btn.is-popping { animation: ctaPop 0.4s var(--ease-lux); }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-canvas { display: none; }
+  .pop-particle { display: none; }
+}
 
 /* =========================================================
    RESPONSIVE FIXES
