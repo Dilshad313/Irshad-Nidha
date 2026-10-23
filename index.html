@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Irshad &amp; Nidha | Wedding Invitation</title>
-<meta name="description" content="You are warmly invited to celebrate the blessed Nikah of Irshad &amp; Nidha.">
+<title>Mohammed Irshad &amp; Nidha Fathima | Wedding Invitation</title>
+<meta name="description" content="You are warmly invited to celebrate the blessed Nikah of Mohammed Irshad &amp; Nidha Fathima.">
 <meta name="theme-color" content="#0D1F3C">
 
 <!-- Open Graph -->
-<meta property="og:title" content="Irshad &amp; Nidha | Wedding Invitation">
-<meta property="og:description" content="You are warmly invited to celebrate the blessed Nikah of Irshad &amp; Nidha.">
+<meta property="og:title" content="Mohammed Irshad &amp; Nidha Fathima | Wedding Invitation">
+<meta property="og:description" content="You are warmly invited to celebrate the blessed Nikah of Mohammed Irshad &amp; Nidha Fathima.">
 <meta property="og:type" content="website">
 <!-- Add a real hosted image URL here before sharing, e.g.: <meta property="og:image" content="https://your-domain.com/assets/share.jpg"> -->
 
@@ -18,7 +18,10 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Trimmed to the weights/styles actually used in style.css (verified: no
+     element sets Amiri 700, Cormorant 500/600, Playfair 600/700, or Poppins
+     300) — fewer font files to fetch over mobile data. -->
+<link href="https://fonts.googleapis.com/css2?family=Amiri&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;1,500&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="style.css">
 </head>
@@ -35,7 +38,11 @@
   <div class="gate-content">
     <p class="gate-eyebrow">The Wedding Of</p>
     <div class="gate-monogram" aria-hidden="true"><span>I</span><span class="gm-amp">&amp;</span><span>N</span></div>
-    <h2 class="gate-names" id="gateNames">Irshad <span class="gate-amp">&amp;</span> Nidha</h2>
+    <h2 class="gate-names" id="gateNames">
+      <span class="gate-name-part" id="gateNameGroom">Mohammed Irshad</span>
+      <span class="gate-amp-row"><span class="gate-amp">&amp;</span></span>
+      <span class="gate-name-part" id="gateNameBride">Nidha Fathima</span>
+    </h2>
     <p class="gate-date" id="gateDate">Sunday · 29th November 2026</p>
     <button type="button" class="gate-open-btn" id="gateOpenBtn"><span>Open Invitation</span></button>
     <p class="gate-note">Tap to open &amp; play the music &#9834;</p>
@@ -45,7 +52,7 @@
 <!-- ============ NAVIGATION ============ -->
 <header class="site-nav" id="siteNav">
   <div class="nav-inner">
-    <a href="#home" class="nav-brand" aria-label="Irshad and Nidha, home">
+    <a href="#home" class="nav-brand" aria-label="Mohammed Irshad and Nidha Fathima, home">
       <span class="brand-glyph" aria-hidden="true">&#9770;</span>
       <span class="brand-text">I<span class="brand-amp">&amp;</span>N</span>
     </a>
@@ -97,13 +104,13 @@
       <p class="blessing-line">With the blessings of Allah SWT</p>
 
       <div class="couple-names">
-        <h1 class="name" id="heroGroomName">Irshad</h1>
+        <h1 class="name" id="heroGroomName">Mohammed Irshad</h1>
         <div class="divider" aria-hidden="true">
           <span class="divider-line"></span>
           <span class="divider-amp">&amp;</span>
           <span class="divider-line"></span>
         </div>
-        <h1 class="name" id="heroBrideName">Nidha</h1>
+        <h1 class="name" id="heroBrideName">Nidha Fathima</h1>
       </div>
 
       <p class="hero-invite">
@@ -123,7 +130,12 @@
   <section class="section couple" id="couple" aria-labelledby="coupleHeading">
     <div class="container narrow">
       <p class="eyebrow reveal light">The Beloved</p>
-      <h2 class="section-title script light reveal" id="coupleHeading">Irshad &amp; Nidha</h2>
+      <h2 class="section-title script light reveal" id="coupleHeading">
+        <span class="title-names" id="coupleNames">
+          <span class="title-name-line" id="coupleGroomLine">Mohammed Irshad</span>
+          <span class="title-name-line" id="coupleBrideLine">&amp; Nidha Fathima</span>
+        </span>
+      </h2>
       <div class="ornament reveal" aria-hidden="true">&#10070;</div>
       <p class="couple-tagline reveal">
         Two souls, one beautiful journey,<br>
@@ -141,7 +153,7 @@
       <div class="family-grid">
         <article class="family-card reveal">
           <p class="family-role">Groom</p>
-          <h3 class="family-name" id="groomName">Irshad</h3>
+          <h3 class="family-name" id="groomName">Mohammed Irshad</h3>
           <p class="family-of">Son of</p>
           <p class="family-parents">
             <span id="groomFather">[Groom Father's Name &ndash; To Be Added]</span>
@@ -154,7 +166,7 @@
 
         <article class="family-card reveal">
           <p class="family-role">Bride</p>
-          <h3 class="family-name" id="brideName">Nidha</h3>
+          <h3 class="family-name" id="brideName">Nidha Fathima</h3>
           <p class="family-of">Daughter of</p>
           <p class="family-parents">
             <span id="brideFather">[Bride Father's Name &ndash; To Be Added]</span>
@@ -214,7 +226,7 @@
         <h3 class="qr-title">Scan for Location</h3>
         <p class="qr-subtitle">Scan the QR code to open the wedding venue location in Google Maps.</p>
         <div class="qr-box">
-          <img id="qrImage" class="qr-image" src="assets/gallery/qr.png" alt="QR code that opens the wedding venue location on Google Maps">
+          <img id="qrImage" class="qr-image" src="assets/gallery/qr.png" alt="QR code that opens the wedding venue location on Google Maps" loading="lazy" decoding="async">
           <p class="qr-placeholder-text" id="qrPlaceholderText" hidden>Venue location to be announced soon.</p>
         </div>
         <p class="qr-caption"><span aria-hidden="true">&#128205;</span> Scan for Location</p>
@@ -272,13 +284,18 @@
   <section class="section final" aria-label="Closing">
     <div class="pattern-overlay" aria-hidden="true"></div>
     <div class="container narrow">
-      <h2 class="section-title script light reveal">Irshad &amp; Nidha</h2>
+      <h2 class="section-title script light reveal" id="finalHeading">
+        <span class="title-names" id="finalNames">
+          <span class="title-name-line" id="finalGroomLine">Mohammed Irshad</span>
+          <span class="title-name-line" id="finalBrideLine">&amp; Nidha Fathima</span>
+        </span>
+      </h2>
       <p class="final-blessing reveal">
         May Allah bless this union with<br>
         love, mercy, happiness and barakah.
       </p>
       <p class="final-signoff reveal">With Love &amp; Duas</p>
-      <p class="final-families reveal">The Families of Irshad &amp; Nidha</p>
+      <p class="final-families reveal" id="finalFamilies">The Families of Mohammed Irshad &amp; Nidha Fathima</p>
     </div>
     <div class="mosque-silhouette" aria-hidden="true"></div>
   </section>
@@ -292,7 +309,7 @@
 
 <!-- Background music (assets/music/music.mp3) is managed entirely by Howler.js in
      script.js — no <audio> element here, so there is only ever one audio instance. -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js" defer></script>
 <script src="script.js" defer></script>
 </body>
 </html>

@@ -5,8 +5,8 @@
    ========================================================= */
 
 const weddingData = {
-  groom: "Irshad",
-  bride: "Nidha",
+  groom: "Mohammed Irshad",
+  bride: "Nidha Fathima",
 
   groomFather: "Rasheed",
   groomMother: "Nadeera",
@@ -65,14 +65,69 @@ function populateContent() {
     if (el) el.textContent = value;
   });
 
-  // Intro gate content
-  const gateNames = document.getElementById('gateNames');
-  if (gateNames) gateNames.innerHTML =
-    `${weddingData.groom} <span class="gate-amp">&amp;</span> ${weddingData.bride}`;
+  // Longer full names need a smaller type size so they never outgrow their
+  // card/line — .name--long / .name--xlong are applied here based on length,
+  // everywhere a name appears (hero, family cards, gate, section titles).
+  const groomSizeClass = sizeClassForName(weddingData.groom);
+  const brideSizeClass = sizeClassForName(weddingData.bride);
+  const pairSizeClass = strongerSizeClass(groomSizeClass, brideSizeClass);
+
+  // Hero names sit directly stacked with a divider between them, so both
+  // use the same (larger-reduction) size for visual symmetry. Family cards
+  // are separate, independent cards, so each sizes to its own name.
+  applySizeClass(document.getElementById('heroGroomName'), pairSizeClass);
+  applySizeClass(document.getElementById('heroBrideName'), pairSizeClass);
+  applySizeClass(document.getElementById('groomName'), groomSizeClass);
+  applySizeClass(document.getElementById('brideName'), brideSizeClass);
+
+  // Intro gate: groom / "&" / bride on three stacked rows.
+  const gateNameGroom = document.getElementById('gateNameGroom');
+  if (gateNameGroom) {
+    gateNameGroom.textContent = weddingData.groom;
+    applySizeClass(gateNameGroom, pairSizeClass);
+  }
+  const gateNameBride = document.getElementById('gateNameBride');
+  if (gateNameBride) {
+    gateNameBride.textContent = weddingData.bride;
+    applySizeClass(gateNameBride, pairSizeClass);
+  }
   const gateDate = document.getElementById('gateDate');
   if (gateDate) gateDate.textContent = `${weddingData.day} · ${weddingData.date}`;
 
+  // Couple / Final section titles: "Groom" over "& Bride" on two lines.
+  ['coupleGroomLine', 'finalGroomLine'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = weddingData.groom;
+    applySizeClass(el, pairSizeClass);
+  });
+  ['coupleBrideLine', 'finalBrideLine'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = `& ${weddingData.bride}`;
+    applySizeClass(el, pairSizeClass);
+  });
+
+  const finalFamilies = document.getElementById('finalFamilies');
+  if (finalFamilies) finalFamilies.textContent = `The Families of ${weddingData.groom} & ${weddingData.bride}`;
+
   document.title = `${weddingData.groom} & ${weddingData.bride} | Wedding Invitation`;
+}
+
+/* ---------- Name-length-based type sizing (see CSS .name--long/.name--xlong) ---------- */
+function sizeClassForName(name) {
+  if (name.length >= 15) return 'name--xlong';
+  if (name.length >= 9) return 'name--long';
+  return '';
+}
+function strongerSizeClass(a, b) {
+  const order = ['', 'name--long', 'name--xlong'];
+  return order[Math.max(order.indexOf(a), order.indexOf(b))];
+}
+function applySizeClass(el, sizeClass) {
+  if (!el) return;
+  el.classList.remove('name--long', 'name--xlong');
+  if (sizeClass) el.classList.add(sizeClass);
 }
 
 /* ---------- Intro gate (opening experience) ---------- */
@@ -262,7 +317,11 @@ function initQrCode() {
   });
 }
 
-/* ---------- Background music (unchanged: assets/music/music.mp3) ---------- */
+/* ---------- Background music (assets/music/music.mp3, ~5MB) ----------
+   The file is only ever fetched after a genuine user interaction — never
+   eagerly on page load — so it can't compete with the page's own assets
+   for bandwidth on mobile, and visitors who never interact never pay for
+   it at all. Howler itself isn't created until that first interaction. */
 function initMusic() {
   const toggle = document.getElementById('musicToggle');
   const hint = document.getElementById('musicHint');
@@ -272,58 +331,73 @@ function initMusic() {
     return;
   }
 
+  let sound = null;
   let fileOk = true;
+  let started = false;
 
   const hideHint = () => { if (hint) hint.hidden = true; };
 
   const syncToggle = () => {
     if (!fileOk) return;
     toggle.hidden = false;
-    const playing = sound.playing();
+    const playing = sound ? sound.playing() : false;
     toggle.setAttribute('aria-pressed', String(playing));
     toggle.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
     if (playing) hideHint();
   };
 
-  const sound = new Howl({
-    src: ['assets/music/music.mp3'],
-    loop: true,
-    preload: true,
-    // html5:true is required so the file loads when the page is opened
-    // directly from disk (file://) — XHR-based Web Audio loading is
-    // blocked there by Chromium's CORS policy.
-    html5: true,
-    onplay: syncToggle,
-    onpause: syncToggle,
-    onstop: syncToggle,
-    onloaderror: () => { fileOk = false; toggle.hidden = true; hideHint(); },
-    onplayerror: () => {
-      syncToggle();
-      if (hint && fileOk) {
-        hint.hidden = false;
-        hint.style.animation = 'none';
-        void hint.offsetWidth;
-        hint.style.animation = '';
-      }
-    },
-  });
+  const getSound = () => {
+    if (sound) return sound;
+    sound = new Howl({
+      src: ['assets/music/music.mp3'],
+      loop: true,
+      // Loading begins only when .play() is first called (see start()
+      // below), not as soon as this Howl exists.
+      preload: false,
+      // html5:true is required so the file loads when the page is opened
+      // directly from disk (file://) — XHR-based Web Audio loading is
+      // blocked there by Chromium's CORS policy.
+      html5: true,
+      onplay: syncToggle,
+      onpause: syncToggle,
+      onstop: syncToggle,
+      onloaderror: () => { fileOk = false; toggle.hidden = true; hideHint(); },
+      onplayerror: () => {
+        syncToggle();
+        if (hint && fileOk) {
+          hint.hidden = false;
+          hint.style.animation = 'none';
+          void hint.offsetWidth;
+          hint.style.animation = '';
+        }
+      },
+    });
+    return sound;
+  };
 
-  // Attempt real (audible) playback on load; the browser may reject it.
-  sound.play();
+  // Starts (and, the first time, loads) playback. Called from the first
+  // genuine interaction anywhere on the page — including the "Open
+  // Invitation" button on the intro gate — so music starts exactly when
+  // the invitation is opened, same as before.
+  const start = () => {
+    if (started || !fileOk) return;
+    started = true;
+    getSound().play();
+  };
 
-  // Retry at the first genuine interaction anywhere on the page — this
-  // includes the "Open Invitation" button on the intro gate, so music
-  // starts exactly when the invitation is opened.
   const INTERACTION_EVENTS = ['click', 'touchend', 'keydown'];
   const onInteraction = (event) => {
-    if (sound.playing() || !fileOk) return;
     if (event.target && event.target.closest && event.target.closest('#musicToggle')) return;
-    sound.play();
+    start();
   };
   INTERACTION_EVENTS.forEach((type) => document.addEventListener(type, onInteraction, { passive: true }));
 
   toggle.addEventListener('click', () => {
     if (!fileOk) return;
+    if (!sound) {
+      start();
+      return;
+    }
     if (sound.playing()) {
       sound.pause();
     } else {

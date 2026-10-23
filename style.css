@@ -134,6 +134,17 @@ html { scrollbar-color: var(--gold) var(--deep-green); scrollbar-width: thin; }
   letter-spacing: 0.01em;
   font-size: clamp(2.7rem, 8vw, 4.4rem);
 }
+/* Stacks "Groom" over "& Bride" on two lines so a long full name never
+   fights the flanking gold rules for space; sizes shrink via JS classes
+   based on name length, same mechanism as the hero and gate names. */
+.section-title.script .title-names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+}
+.title-name-line.name--long  { font-size: 0.72em; }
+.title-name-line.name--xlong { font-size: 0.56em; }
 
 .ornament {
   text-align: center;
@@ -288,13 +299,22 @@ body.gate-active { overflow: hidden; }
 .gate-names {
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: clamp(3rem, 10vw, 4.6rem);
   color: var(--cream);
   line-height: 1.15;
   text-shadow: 0 0 30px rgba(212, 175, 55, 0.35);
   opacity: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05em;
   animation: gateRise 1s var(--ease-lux) 0.8s forwards, nameGlow 4.5s ease-in-out 2.2s infinite;
 }
+/* Each name is its own row so a long full name shrinks independently
+   instead of forcing the whole "Groom & Bride" line onto one size. */
+.gate-name-part { font-size: clamp(3rem, 10vw, 4.6rem); }
+.gate-name-part.name--long  { font-size: clamp(1.9rem, 6.5vw, 3rem); }
+.gate-name-part.name--xlong { font-size: clamp(1.6rem, 5.5vw, 2.6rem); }
+.gate-amp-row { font-size: clamp(1.2rem, 3.5vw, 1.7rem); margin: -0.05em 0; }
 .gate-amp { color: var(--gold-light); }
 .gate-date {
   font-family: var(--font-heading);
@@ -653,6 +673,10 @@ body.gate-active { overflow: hidden; }
   color: var(--cream);
   line-height: 1.1;
 }
+/* Longer full names (e.g. "Mohammed Irshad") get a smaller clamp so they
+   never outgrow the card — applied via JS based on name length. */
+.name.name--long  { font-size: clamp(2.3rem, 9vw, 3.9rem); }
+.name.name--xlong { font-size: clamp(1.9rem, 7.5vw, 3.2rem); }
 .divider {
   display: flex; align-items: center; justify-content: center;
   gap: 0.8rem; margin: 0.4rem 0;
@@ -758,6 +782,8 @@ body.gate-active { overflow: hidden; }
   font-size: 1.75rem;
   margin-bottom: 0.9rem;
 }
+.family-name.name--long  { font-size: 1.35rem; }
+.family-name.name--xlong { font-size: 1.15rem; }
 .family-of { font-size: 0.85rem; color: var(--gold-light); margin-bottom: 0.3rem; }
 .family-parents { font-size: 0.95rem; line-height: 1.7; }
 .family-sep { color: var(--gold); font-size: 1.6rem; text-shadow: 0 0 16px rgba(212,175,55,0.55); }
@@ -1133,7 +1159,8 @@ body.gate-open .divider-amp { animation: popIn 0.5s ease 1.55s both; }
    ========================================================= */
 @media (max-width: 480px) {
   .countdown-grid { gap: 0.6rem; }
-  .event-row { flex-direction: column; gap: 0.2rem; }
+  .event-row { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+  .event-label { align-self: flex-start; }
   .event-value { text-align: left; }
   .family-grid { gap: 1.2rem; }
   .section-title { gap: 0.7rem; }

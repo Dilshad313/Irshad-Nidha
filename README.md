@@ -1,4 +1,4 @@
-# Irshad & Nidha — Wedding Invitation
+# Mohammed Irshad & Nidha Fathima — Wedding Invitation
 
 A standalone, premium Islamic wedding invitation site. Pure HTML, CSS and
 vanilla JavaScript — no build step, no backend. Open `index.html` directly
@@ -11,8 +11,8 @@ object at the top of [script.js](script.js).
 
 ```js
 const weddingData = {
-  groom: "Irshad",
-  bride: "Nidha",
+  groom: "Mohammed Irshad",
+  bride: "Nidha Fathima",
   groomFather: "...",
   groomMother: "...",
   brideFather: "...",
@@ -30,6 +30,13 @@ const weddingData = {
 Until `weddingDateISO` and `googleMapsUrl` are filled in, the site shows
 honest placeholders ("Date to be announced", disabled direction buttons)
 instead of fake data.
+
+Every place a name appears (hero, family cards, intro gate, the two script
+"Groom & Bride" headings) sizes itself automatically based on `groom`/`bride`
+string length — see `sizeClassForName()` in [script.js](script.js) and the
+`.name--long` / `.name--xlong` rules in [style.css](style.css). Longer full
+names just render a bit smaller; no manual font-size tuning needed when you
+change them.
 
 ## Location QR code
 
