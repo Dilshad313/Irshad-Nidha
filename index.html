@@ -11,16 +11,12 @@
 <meta property="og:title" content="Mohammed Irshad &amp; Nidha Fathima | Wedding Invitation">
 <meta property="og:description" content="You are warmly invited to celebrate the blessed Nikah of Mohammed Irshad &amp; Nidha Fathima.">
 <meta property="og:type" content="website">
-<!-- Add a real hosted image URL here before sharing, e.g.: <meta property="og:image" content="https://your-domain.com/assets/share.jpg"> -->
 
 <!-- Favicon: a simple gold crescent & star, inline so no extra file is needed -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230D1F3C'/%3E%3Cpath d='M38 16a18 18 0 1 0 0 32 14 14 0 1 1 0-32z' fill='%23D4AF37'/%3E%3Cpath d='M46 16l2.2 4.6L53 22l-4.8 1.4L46 28l-2.2-4.6L39 22l4.8-1.4z' fill='%23D4AF37'/%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Trimmed to the weights/styles actually used in style.css (verified: no
-     element sets Amiri 700, Cormorant 500/600, Playfair 600/700, or Poppins
-     300) — fewer font files to fetch over mobile data. -->
 <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;1,500&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="style.css">
@@ -69,9 +65,6 @@
       <button type="button" class="music-toggle" id="musicToggle" aria-pressed="false" aria-label="Play background music" hidden>
         <span class="music-icon" aria-hidden="true">&#9834;</span>
       </button>
-      <!-- Shown only if audible autoplay was blocked; disappears the instant
-           music starts (any tap anywhere) or after a few seconds either way.
-           Decorative and non-blocking — never intercepts clicks. -->
       <span class="music-hint" id="musicHint" aria-hidden="true" hidden>Tap for music &#9834;</span>
       <button type="button" class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
         <span></span><span></span><span></span>
@@ -151,29 +144,47 @@
       <h2 class="section-title light reveal" id="familiesHeading">Our Families</h2>
 
       <div class="family-grid">
+
+        <!-- GROOM -->
         <article class="family-card reveal">
           <p class="family-role">Groom</p>
           <h3 class="family-name" id="groomName">Mohammed Irshad</h3>
+
           <p class="family-of">Son of</p>
           <p class="family-parents">
-            <span id="groomFather">[Groom Father's Name &ndash; To Be Added]</span>
-            &amp;
-            <span id="groomMother">[Groom Mother's Name &ndash; To Be Added]</span>
+            <span id="groomFather">Rasheed</span>
+            <span class="family-amp" aria-hidden="true">&amp;</span>
+            <span id="groomMother">Nadeera</span>
+          </p>
+
+          <p class="family-address">
+            <span id="groomHouse">Kunnath (H)</span><br>
+            <span id="groomPlace">Kottappuram (PO)</span><br>
+            <span id="groomDistrict">Palakkad (DT)</span>
           </p>
         </article>
 
         <div class="family-sep" aria-hidden="true">&#9770;</div>
 
+        <!-- BRIDE -->
         <article class="family-card reveal">
           <p class="family-role">Bride</p>
           <h3 class="family-name" id="brideName">Nidha Fathima</h3>
+
           <p class="family-of">Daughter of</p>
           <p class="family-parents">
-            <span id="brideFather">[Bride Father's Name &ndash; To Be Added]</span>
-            &amp;
-            <span id="brideMother">[Bride Mother's Name &ndash; To Be Added]</span>
+            <span id="brideFather">Basheer</span>
+            <span class="family-amp" aria-hidden="true">&amp;</span>
+            <span id="brideMother">Laila</span>
+          </p>
+
+          <p class="family-address">
+            <span id="brideHouse">Kondoshan Parambil (H)</span><br>
+            <span id="bridePlace">Mundakanni, Mannarkkad</span><br>
+            <span id="brideDistrict">Palakkad (DT)</span>
           </p>
         </article>
+
       </div>
     </div>
   </section>
@@ -302,13 +313,8 @@
 
 </main>
 
-<!-- Celebration layer: fireworks + confetti, drawn on a single full-screen
-     canvas. Purely decorative, never intercepts clicks. Skipped entirely
-     for prefers-reduced-motion users (see initCelebration in script.js). -->
 <canvas id="fxCanvas" class="fx-canvas" aria-hidden="true"></canvas>
 
-<!-- Background music (assets/music/music.mp3) is managed entirely by Howler.js in
-     script.js — no <audio> element here, so there is only ever one audio instance. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js" defer></script>
 <script src="script.js" defer></script>
 </body>

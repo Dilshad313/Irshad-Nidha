@@ -8,15 +8,24 @@ const weddingData = {
   groom: "Mohammed Irshad",
   bride: "Nidha Fathima",
 
+  // --- Groom's family ---
   groomFather: "Rasheed",
   groomMother: "Nadeera",
-  brideFather: "[Bride Father's Name – To Be Added]",
-  brideMother: "[Bride Mother's Name – To Be Added]",
+  groomHouse: "Kunnath (H)",
+  groomPlace: "Kottappuram (PO)",
+  groomDistrict: "Palakkad (DT)",
+
+  // --- Bride's family ---
+  brideFather: "Basheer",
+  brideMother: "Laila",
+  brideHouse: "Kondoshan Parambil (H)",
+  bridePlace: "Mundakanni, Mannarkkad",
+  brideDistrict: "Palakkad (DT)",
 
   // Display text shown on the Reception Details card. Edit freely.
   date: "29th November 2026",
   day: "Sunday",
-  time: "10:30", // AM/PM not specified — confirm and add it here, e.g. "10:30 AM"
+  time: "10:30",
   venue: "Moulana Auditorium",
   address: "Kozhikkode Road, Aryambavu, Kombam",
 
@@ -48,10 +57,21 @@ function populateContent() {
     brideName: weddingData.bride,
     heroGroomName: weddingData.groom,
     heroBrideName: weddingData.bride,
+
+    // Families — parents
     groomFather: weddingData.groomFather,
     groomMother: weddingData.groomMother,
     brideFather: weddingData.brideFather,
     brideMother: weddingData.brideMother,
+
+    // Families — addresses
+    groomHouse:    weddingData.groomHouse,
+    groomPlace:    weddingData.groomPlace,
+    groomDistrict: weddingData.groomDistrict,
+    brideHouse:    weddingData.brideHouse,
+    bridePlace:    weddingData.bridePlace,
+    brideDistrict: weddingData.brideDistrict,
+
     nikahDate: weddingData.date,
     nikahDay: weddingData.day,
     nikahTime: weddingData.time,
@@ -72,9 +92,6 @@ function populateContent() {
   const brideSizeClass = sizeClassForName(weddingData.bride);
   const pairSizeClass = strongerSizeClass(groomSizeClass, brideSizeClass);
 
-  // Hero names sit directly stacked with a divider between them, so both
-  // use the same (larger-reduction) size for visual symmetry. Family cards
-  // are separate, independent cards, so each sizes to its own name.
   applySizeClass(document.getElementById('heroGroomName'), pairSizeClass);
   applySizeClass(document.getElementById('heroBrideName'), pairSizeClass);
   applySizeClass(document.getElementById('groomName'), groomSizeClass);
@@ -142,14 +159,11 @@ function initGate() {
     document.body.classList.remove('gate-active');
     document.body.classList.add('gate-open');
     gate.classList.add('opened');
-    // The first genuine interaction also unlocks background music via the
-    // document-level listener in initMusic() — nothing extra needed here.
     document.dispatchEvent(new CustomEvent('invitation:open'));
     setTimeout(() => gate.remove(), 1700);
   };
 
   if (reduceMotion) {
-    // No ceremony for reduced-motion users — land straight on the page.
     gate.remove();
     document.body.classList.add('gate-open');
     return;
@@ -184,7 +198,6 @@ function initNav() {
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
 
-  // Transparent over the hero, solid after scrolling.
   if (nav) {
     const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 40);
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -317,11 +330,7 @@ function initQrCode() {
   });
 }
 
-/* ---------- Background music (assets/music/music.mp3, ~5MB) ----------
-   The file is only ever fetched after a genuine user interaction — never
-   eagerly on page load — so it can't compete with the page's own assets
-   for bandwidth on mobile, and visitors who never interact never pay for
-   it at all. Howler itself isn't created until that first interaction. */
+/* ---------- Background music ---------- */
 function initMusic() {
   const toggle = document.getElementById('musicToggle');
   const hint = document.getElementById('musicHint');
@@ -351,12 +360,7 @@ function initMusic() {
     sound = new Howl({
       src: ['assets/music/music.mp3'],
       loop: true,
-      // Loading begins only when .play() is first called (see start()
-      // below), not as soon as this Howl exists.
       preload: false,
-      // html5:true is required so the file loads when the page is opened
-      // directly from disk (file://) — XHR-based Web Audio loading is
-      // blocked there by Chromium's CORS policy.
       html5: true,
       onplay: syncToggle,
       onpause: syncToggle,
@@ -375,10 +379,6 @@ function initMusic() {
     return sound;
   };
 
-  // Starts (and, the first time, loads) playback. Called from the first
-  // genuine interaction anywhere on the page — including the "Open
-  // Invitation" button on the intro gate — so music starts exactly when
-  // the invitation is opened, same as before.
   const start = () => {
     if (started || !fileOk) return;
     started = true;
@@ -409,10 +409,7 @@ function initMusic() {
   syncToggle();
 }
 
-/* ---------- Celebration: fireworks + confetti on a single canvas ----------
-   Fires on the 'invitation:open' event (dispatched by initGate when the
-   gate opens) and again on 'countdown:done' (dispatched by initCountdown
-   when the big day arrives). Fully skipped for prefers-reduced-motion. */
+/* ---------- Celebration ---------- */
 function initCelebration() {
   const canvas = document.getElementById('fxCanvas');
   if (!canvas) return;
@@ -562,7 +559,7 @@ function initCelebration() {
   document.addEventListener('countdown:done', celebrateMilestone);
 }
 
-/* ---------- Pop effect: small confetti burst on button taps ---------- */
+/* ---------- Pop effect ---------- */
 function initPopEffects() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 

@@ -89,9 +89,6 @@ html { scrollbar-color: var(--gold) var(--deep-green); scrollbar-width: thin; }
   position: relative;
   padding: clamp(4rem, 9vw, 7.5rem) 0;
   overflow: hidden;
-  /* Clears the fixed nav bar when jumping to a section via an anchor link
-     (nav links, skip-link) — without this the section's heading lands
-     partly hidden under the bar. */
   scroll-margin-top: 84px;
 }
 
@@ -106,7 +103,6 @@ html { scrollbar-color: var(--gold) var(--deep-green); scrollbar-width: thin; }
 }
 .eyebrow.light { color: var(--gold-light); }
 
-/* Premium section titles: gold lines drawn to each side */
 .section-title {
   font-family: var(--font-heading);
   font-weight: 600;
@@ -134,9 +130,6 @@ html { scrollbar-color: var(--gold) var(--deep-green); scrollbar-width: thin; }
   letter-spacing: 0.01em;
   font-size: clamp(2.7rem, 8vw, 4.4rem);
 }
-/* Stacks "Groom" over "& Bride" on two lines so a long full name never
-   fights the flanking gold rules for space; sizes shrink via JS classes
-   based on name length, same mechanism as the hero and gate names. */
 .section-title.script .title-names {
   display: flex;
   flex-direction: column;
@@ -195,8 +188,6 @@ html { scrollbar-color: var(--gold) var(--deep-green); scrollbar-width: thin; }
 .btn-gold:hover, .btn-gold:focus-visible { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.55); }
 .btn-gold:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
-/* Only ever used on the dark QR card, so it's styled light-on-dark rather
-   than the dark-on-light its name suggests — avoids low-contrast text. */
 .btn-outline { background: transparent; border-color: var(--gold-light); color: var(--cream); }
 .btn-outline:hover, .btn-outline:focus-visible { background: var(--gold-light); color: var(--deep-green); }
 
@@ -309,8 +300,6 @@ body.gate-active { overflow: hidden; }
   gap: 0.05em;
   animation: gateRise 1s var(--ease-lux) 0.8s forwards, nameGlow 4.5s ease-in-out 2.2s infinite;
 }
-/* Each name is its own row so a long full name shrinks independently
-   instead of forcing the whole "Groom & Bride" line onto one size. */
 .gate-name-part { font-size: clamp(3rem, 10vw, 4.6rem); }
 .gate-name-part.name--long  { font-size: clamp(1.9rem, 6.5vw, 3rem); }
 .gate-name-part.name--xlong { font-size: clamp(1.6rem, 5.5vw, 2.6rem); }
@@ -374,7 +363,7 @@ body.gate-active { overflow: hidden; }
 }
 
 /* =========================================================
-   SPARKLES (shared by gate & hero)
+   SPARKLES
    ========================================================= */
 .sparkles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .sparkle {
@@ -525,9 +514,6 @@ body.gate-active { overflow: hidden; }
    HERO
    ========================================================= */
 .hero {
-  /* 100dvh (where supported) tracks the browser's real visible viewport,
-     so the hero doesn't resize/jump as the mobile address bar shows and
-     hides while scrolling — 100vh stays as the fallback for older browsers. */
   min-height: 100vh;
   min-height: 100dvh;
   display: flex; align-items: center; justify-content: center;
@@ -540,7 +526,6 @@ body.gate-active { overflow: hidden; }
   text-align: center;
 }
 
-/* ---- Ambient falling petals (whole hero, very subtle) ---- */
 .falling-petals { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
 .petal {
   position: absolute;
@@ -556,9 +541,6 @@ body.gate-active { overflow: hidden; }
   92%  { opacity: 0.6; }
   100% {
     opacity: 0;
-    /* lvh (largest viewport height) is used here instead of dvh/vh on
-       purpose: it stays constant while the mobile address bar shows/hides,
-       so a petal mid-fall never visibly snaps to a new end point. */
     transform: translate(var(--petal-drift, 40px), 112vh) rotate(300deg);
     transform: translate(var(--petal-drift, 40px), 112lvh) rotate(300deg);
   }
@@ -572,7 +554,6 @@ body.gate-active { overflow: hidden; }
   .falling-petals { display: none; }
 }
 
-/* ---- Floral crest: the premium central bouquet sitting atop the card ---- */
 .floral-crest {
   position: absolute;
   top: clamp(-150px, -17vw, -80px);
@@ -593,7 +574,6 @@ body.gate-active { overflow: hidden; }
   .floral-crest { animation: none; transform: translateX(-50%); }
 }
 
-/* ---- Floral divider: small closing flourish under the invite text ---- */
 .floral-divider {
   width: clamp(78px, 20vw, 116px);
   aspect-ratio: 120 / 70;
@@ -621,8 +601,6 @@ body.gate-active { overflow: hidden; }
   0%, 100% { box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.22), 0 0 34px rgba(212, 175, 55, 0.10), var(--shadow-soft); }
   50%      { box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.4),  0 0 54px rgba(212, 175, 55, 0.22), var(--shadow-soft); }
 }
-/* Fine inner hairline — echoes the outer arch a little further in for a
-   "frame within a frame" look, matching the qr-card's inset border. */
 .arch-frame::after {
   content: '';
   position: absolute; inset: 11px;
@@ -673,8 +651,6 @@ body.gate-active { overflow: hidden; }
   color: var(--cream);
   line-height: 1.1;
 }
-/* Longer full names (e.g. "Mohammed Irshad") get a smaller clamp so they
-   never outgrow the card — applied via JS based on name length. */
 .name.name--long  { font-size: clamp(2.3rem, 9vw, 3.9rem); }
 .name.name--xlong { font-size: clamp(1.9rem, 7.5vw, 3.2rem); }
 .divider {
@@ -734,27 +710,31 @@ body.gate-active { overflow: hidden; }
 }
 
 /* =========================================================
-   FAMILIES
+   FAMILIES — mobile-first, no overflow, stacked addresses
    ========================================================= */
 .families {
   background: var(--deep-green);
   color: var(--cream);
   text-align: center;
 }
+
 .family-grid {
-  display: flex; justify-content: center; align-items: center;
-  gap: clamp(1.5rem, 5vw, 3.5rem);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
   margin-top: 2.6rem;
-  flex-wrap: wrap;
+  align-items: stretch;
 }
+
 .family-card {
-  flex: 1 1 220px;
-  max-width: 290px;
-  padding: 2.2rem 1.4rem;
+  padding: 2rem 1.35rem;
   background: linear-gradient(180deg, rgba(245, 242, 232, 0.07), rgba(245, 242, 232, 0.02));
   border: 1px solid rgba(212, 175, 55, 0.35);
   border-radius: var(--radius);
   position: relative;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
   transition: transform 0.45s var(--ease-lux), box-shadow 0.45s var(--ease-lux), border-color 0.45s ease;
 }
 .family-card::before {
@@ -764,11 +744,14 @@ body.gate-active { overflow: hidden; }
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
   opacity: 0.7;
 }
-.family-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(212, 175, 55, 0.7);
-  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.4), 0 0 34px rgba(212, 175, 55, 0.14);
+@media (hover: hover) {
+  .family-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(212, 175, 55, 0.7);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.4), 0 0 34px rgba(212, 175, 55, 0.14);
+  }
 }
+
 .family-role {
   font-family: var(--font-sans);
   letter-spacing: 0.2em;
@@ -777,16 +760,65 @@ body.gate-active { overflow: hidden; }
   color: var(--gold-light);
   margin-bottom: 0.7rem;
 }
+
 .family-name {
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: clamp(1.35rem, 5.5vw, 1.75rem);
+  line-height: 1.2;
   margin-bottom: 0.9rem;
 }
-.family-name.name--long  { font-size: 1.35rem; }
-.family-name.name--xlong { font-size: 1.15rem; }
-.family-of { font-size: 0.85rem; color: var(--gold-light); margin-bottom: 0.3rem; }
-.family-parents { font-size: 0.95rem; line-height: 1.7; }
-.family-sep { color: var(--gold); font-size: 1.6rem; text-shadow: 0 0 16px rgba(212,175,55,0.55); }
+.family-name.name--long  { font-size: clamp(1.15rem, 4.8vw, 1.35rem); }
+.family-name.name--xlong { font-size: clamp(1rem, 4.2vw, 1.15rem); }
+
+.family-of {
+  font-size: 0.85rem;
+  color: var(--gold-light);
+  margin-bottom: 0.35rem;
+}
+
+.family-parents {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.3rem 0.5rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 0.85rem;
+}
+.family-parents > span {
+  white-space: nowrap;
+}
+.family-amp {
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-style: italic;
+}
+
+.family-address {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: rgba(236, 232, 216, 0.75);
+  margin: 0;
+}
+.family-address span { display: inline; }
+
+.family-sep {
+  color: var(--gold);
+  font-size: 1.5rem;
+  text-shadow: 0 0 16px rgba(212, 175, 55, 0.55);
+  line-height: 1;
+}
+
+@media (min-width: 700px) {
+  .family-grid {
+    grid-template-columns: 1fr auto 1fr;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+    align-items: center;
+  }
+  .family-parents { flex-wrap: nowrap; }
+}
 
 /* =========================================================
    NIKAH DETAILS
@@ -863,7 +895,6 @@ body.gate-active { overflow: hidden; }
   transform: translateY(-6px);
   box-shadow: var(--shadow-soft), 0 0 60px rgba(212, 175, 55, 0.22);
 }
-/* inner fine gold frame */
 .qr-card::before {
   content: '';
   position: absolute; inset: 9px;
@@ -1023,7 +1054,7 @@ body.gate-active { overflow: hidden; }
 @keyframes silhouetteBreathe { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
 
 /* =========================================================
-   HERO ENTRANCE — plays when the gate opens (or without gate)
+   HERO ENTRANCE
    ========================================================= */
 @keyframes heroRise {
   from { opacity: 0; transform: translateY(22px); }
@@ -1063,7 +1094,6 @@ body.gate-open .arch-frame .hero-invite { animation: heroRise 0.9s ease 1.5s bot
 body:not(.gate-active) .scroll-cue,
 body.gate-open .scroll-cue { animation: heroRise 0.8s ease 2s both; }
 
-/* Divider lines draw inward, ampersand pops after */
 body:not(.gate-active) .divider-line,
 body.gate-open .divider-line { animation: drawLine 0.7s ease 1.05s both; }
 @keyframes drawLine { to { width: 50px; } }
@@ -1071,14 +1101,12 @@ body:not(.gate-active) .divider-amp,
 body.gate-open .divider-amp { animation: popIn 0.5s ease 1.55s both; }
 @keyframes popIn { to { opacity: 1; transform: scale(1); } }
 
-/* Ornament spin-settle on scroll */
 .ornament.reveal {
   transform: rotate(-90deg) scale(0.4);
   transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .ornament.reveal.in { transform: rotate(0deg) scale(1); }
 
-/* Staggered reveals */
 .family-grid .family-card:nth-of-type(2) { transition-delay: 0.15s; }
 .event-card .event-row.reveal:nth-of-type(1) { transition-delay: 0s; }
 .event-card .event-row.reveal:nth-of-type(2) { transition-delay: 0.08s; }
@@ -1090,7 +1118,6 @@ body.gate-open .divider-amp { animation: popIn 0.5s ease 1.55s both; }
 .countdown-grid .countdown-cell.reveal:nth-child(3) { transition-delay: 0.2s; }
 .countdown-grid .countdown-cell.reveal:nth-child(4) { transition-delay: 0.3s; }
 
-/* Countdown digit pulse */
 .countdown-num.pulse { animation: numPulse 0.4s ease; }
 @keyframes numPulse {
   0%   { transform: scale(1);    color: var(--cream); }
@@ -1098,7 +1125,6 @@ body.gate-open .divider-amp { animation: popIn 0.5s ease 1.55s both; }
   100% { transform: scale(1);    color: var(--cream); }
 }
 
-/* Nav drop-in */
 @keyframes navDrop {
   from { opacity: 0; transform: translateY(-14px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -1106,7 +1132,7 @@ body.gate-open .divider-amp { animation: popIn 0.5s ease 1.55s both; }
 .site-nav { animation: navDrop 0.6s ease both; }
 
 /* =========================================================
-   CELEBRATION EFFECTS — fireworks, confetti, pops
+   CELEBRATION EFFECTS
    ========================================================= */
 .fx-canvas {
   position: fixed;
@@ -1117,8 +1143,6 @@ body.gate-open .divider-amp { animation: popIn 0.5s ease 1.55s both; }
   pointer-events: none;
 }
 
-/* Small "pop" burst used on button taps — lightweight DOM dots rather
-   than canvas, since they're short-lived and few at a time. */
 .pop-particle {
   position: fixed;
   top: 0; left: 0;
@@ -1141,7 +1165,6 @@ body.gate-open .divider-amp { animation: popIn 0.5s ease 1.55s both; }
   }
 }
 
-/* Gentle celebratory bounce on primary call-to-action buttons */
 @keyframes ctaPop {
   0%   { transform: translateY(-2px) scale(1); }
   40%  { transform: translateY(-2px) scale(1.08); }
@@ -1162,7 +1185,7 @@ body.gate-open .divider-amp { animation: popIn 0.5s ease 1.55s both; }
   .event-row { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
   .event-label { align-self: flex-start; }
   .event-value { text-align: left; }
-  .family-grid { gap: 1.2rem; }
   .section-title { gap: 0.7rem; }
   .gate-monogram { width: 108px; height: 108px; font-size: 1.7rem; }
+  .family-card { padding: 1.75rem 1.15rem; }
 }
