@@ -32,7 +32,7 @@ const weddingData = {
   // ISO datetime used ONLY to drive the live countdown (+05:30 IST).
   weddingDateISO: "2026-11-29T10:30:00+05:30",
 
-  // Full Google Maps link to the venue. Leave empty until confirmed.
+  // Full Google Maps link to the venue.
   googleMapsUrl: ""
 };
 
@@ -302,17 +302,21 @@ function initCountdown() {
 
 /* ---------- Location buttons ---------- */
 function initLocation() {
-  const directionsBtn = document.getElementById('directionsBtn');
-  const qrDirectionsBtn = document.getElementById('qrDirectionsBtn');
-  const hasUrl = Boolean(weddingData.googleMapsUrl);
+  const buttons = [
+    document.getElementById('directionsBtn'),
+    document.getElementById('qrDirectionsBtn')
+  ].filter(Boolean);
 
-  [directionsBtn, qrDirectionsBtn].forEach((btn) => {
-    if (!btn) return;
-    if (!hasUrl) {
-      btn.disabled = true;
-      btn.textContent = 'Location to be announced';
-      return;
-    }
+  if (!buttons.length) return;
+
+  // No Maps URL yet? Hide the buttons entirely instead of showing
+  // a "Location to be announced" state.
+  if (!weddingData.googleMapsUrl) {
+    buttons.forEach((btn) => { btn.hidden = true; });
+    return;
+  }
+
+  buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       window.open(weddingData.googleMapsUrl, '_blank', 'noopener');
     });
@@ -322,11 +326,9 @@ function initLocation() {
 /* ---------- QR code (unchanged: uses assets/gallery/qr.png) ---------- */
 function initQrCode() {
   const qrImage = document.getElementById('qrImage');
-  const placeholder = document.getElementById('qrPlaceholderText');
   if (!qrImage) return;
   qrImage.addEventListener('error', () => {
     qrImage.hidden = true;
-    placeholder.hidden = false;
   });
 }
 
